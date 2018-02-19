@@ -1,0 +1,31 @@
+# Compiled source #
+###################
+*.class
+*.com
+*.dll
+*.exe
+*.o
+*.pyc
+*.so
+
+# Packages #
+
+# Logs, databases, and temp files #
+######################
+*.log
+tmp/
+*.swp
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Miscellaneous #
+#################
+node_modules/

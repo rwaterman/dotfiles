@@ -1,0 +1,16 @@
+[user]
+	name = Rick Waterman
+	email = rwaterman+noreply@github.com
+[core]
+	editor = vim
+	excludesfile = /home/rick/.gitignore_global
+	autocrlf = input
+[github]
+  user = rwaterman
+  email = rwaterman@users.noreply.github.com
+[push]
+	default = simple
+[color]
+	ui = auto
+[merge]
+	tool = vimdiff
