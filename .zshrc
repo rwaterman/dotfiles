@@ -16,8 +16,7 @@ export TERM='screen-256color' # Turn on 256 colors (as opposed to 16) in the ter
 export BROWSER='google-chrome-stable' # Browser
 
 ## Use Vim as the default text editor ##
-export EDITOR='subl3'
-export USE_EDITOR=$EDITOR
+export EDITOR='vim'
 export VISUAL=$EDITOR
 
 # ALIASES #
