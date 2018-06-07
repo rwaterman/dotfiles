@@ -6,10 +6,6 @@
 export PATH="$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/$USER/bin:/home/$USER/Android/Sdk/tools" # Create/Update File system PATH
 export LANG='en_US.UTF-8' # Set system language to US English with UTF-8 character encoding
 
-## Ensure Python2 is the default ##
-export PYTHON='python2'
-export python='/usr/bin/python2'
-
 ## Terminal ##
 export TERMINAL='gnome-terminal' # Use Gnome terminal as the default terminal
 export TERM='screen-256color' # Turn on 256 colors (as opposed to 16) in the terminal
@@ -20,11 +16,11 @@ export EDITOR='vim'
 export VISUAL=$EDITOR
 
 # ALIASES #
-alias c='clear' # Clear the screen
+# Mac OS X
+alias brewme
 ## Arch Linux ##
 alias pacmanSyua='sudo pacman -Syu --noconfirm' # Update all packages except for AUR packages.
 alias yaourtSyua='yaourt -Syua --noconfirm' # Update all packages, including AUR packages.
-alias reflectorUpdate='sudo systemctl start reflector'   # Reflector systemd service must be created for this to work first (see Reflector page on Arch Wiki)
 ## Vanilla Zsh Settings ##
 setopt extended_glob # Enables extended globbing (expansion) features
 
@@ -36,7 +32,22 @@ COMPLETION_WAITING_DOTS="true" # The waiting dots appear during tab completions
 DISABLE_UNTRACKED_FILES_DIRTY="false"
 
 ## oh-my-zsh Plugins ##
-plugins=(git tmux)
+plugins=(
+  aws
+  bundler
+  catimg
+  common-aliases
+  git
+  httpie
+  jira
+  node
+  npm
+  nvm-zsh
+  python
+  tmux
+  web-search
+  wd
+)
 
 ### Tmux Plugin Options ###
 ZSH_TMUX_AUTOSTART="true"
@@ -90,3 +101,16 @@ fi
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Python 3 Default Development Virtual Env
+source $HOME/dev/venvs/dev/bin/activate
+
+
+# Pipe Highlight to less (requires 'highlight' be installed)
+export LESSOPEN="| $(which highlight) %s --out-format xterm256 --line-numbers --quiet --force --style zenburn"
+export LESS=" -R"
+alias less='less -m -N -g -i -J --line-numbers --underline-special'
+alias more='less'
+#
+# # Use "highlight" in place of "cat"
+alias cat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style zenburn"
