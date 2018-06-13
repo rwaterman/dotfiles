@@ -32,23 +32,23 @@ DISABLE_UNTRACKED_FILES_DIRTY="false"
 plugins=(
   aws
   bundler
-  catimg
   common-aliases
   docker
   git
   httpie
-  jira
   node
   npm
   nvm-zsh
   python
+  ruby
+  rails
   tmux
-  web-search
   wd
 )
 
 # INITIALIZATION/FIXES
 ## Terminal
+alias c='clear'
 ### oh-my-zsh
 ZSH_TMUX_AUTOSTART="true"
 ZSH_TMUX_AUTOCONNECT="false"
@@ -72,7 +72,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 ## Python
-source $HOME/dev/venvs/dev/bin/activate
+source $HOME/dev/venvs/dev-python2/bin/activate
+# source $HOME/dev/venvs/dev-python3/bin/activate
 ## Ruby
 eval "$(rbenv init -)"
 
