@@ -5,12 +5,19 @@
 # STARTUP INITIALIZATION
 export LANG='en_US.UTF-8' # Set system language to US English with UTF-8 character encoding
 export TERM='screen-256color' # Turn on 256 colors (as opposed to 16) in the terminal
-export PATH="$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/$USER/bin"
+PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
+PATH=$PATH:$HOME/bin:$HOME/go/bin
+## Program path modifications
+export PATH="/usr/local/opt/mysql@5.6/bin:$PATH"
 setopt extended_glob # Enables extended globbing (expansion) features
-
-## oh-my-zsh initialization
-
-## oh-my-zsh plugins
+## oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
+ZSH_THEME="xiong-chiamiov-plus"
+COMPLETION_WAITING_DOTS="true"
+DISABLE_UNTRACKED_FILES_DIRTY="false"
+ZSH_TMUX_AUTOSTART="true"
+ZSH_TMUX_AUTOCONNECT="false"
+stty -ixon # Prevent terminal freezing
 plugins=(
   bundler
   docker
@@ -23,21 +30,11 @@ plugins=(
   tmux
   wd
 )
-
-### oh-my-zsh
-export ZSH=$HOME/.oh-my-zsh
-ZSH_THEME="xiong-chiamiov-plus"
-COMPLETION_WAITING_DOTS="true"
-DISABLE_UNTRACKED_FILES_DIRTY="false"
-
-ZSH_TMUX_AUTOSTART="true"
-ZSH_TMUX_AUTOCONNECT="false"
 source $ZSH/oh-my-zsh.sh
 
 # POST-INITIALIZATION/FIXES
 ## Terminal
 ### General
-stty -ixon # Prevent terminal freezing
 export EDITOR='vim'
 export VISUAL=$EDITOR
 # export TERMINAL='gnome-terminal' # Use Gnome terminal as the default terminal
@@ -104,4 +101,3 @@ calc() {
 ## uninstall by removing these lines or running `tabtab uninstall sls`
 [[ -f /home/rick/node_modules/tabtab/.completions/sls.zsh ]] && . /home/rick/node_modules/tabtab/.completions/sls.zsh
 
-export PATH="/usr/local/opt/mysql@5.6/bin:$PATH"
