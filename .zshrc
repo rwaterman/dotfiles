@@ -20,6 +20,7 @@ ZSH_TMUX_AUTOCONNECT="false"
 stty -ixon # Prevent terminal freezing
 plugins=(
   bundler
+  common-aliases
   docker
   git
   node
