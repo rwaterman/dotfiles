@@ -12,7 +12,12 @@ export PATH="/usr/local/opt/mysql@5.6/bin:$PATH"
 setopt extended_glob # Enables extended globbing (expansion) features
 ## oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
-ZSH_THEME="xiong-chiamiov-plus"
+ZSH_THEME="powerlevel9k/powerlevel9k"
+POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(vcs node_version)
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon context history time dir)
+POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="false"
 ZSH_TMUX_AUTOSTART="true"
@@ -59,16 +64,16 @@ export LESS=" -R"
 alias less='less -m -N -g -i -J --line-numbers --underline-special'
 alias more='less'
 alias cat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style zenburn"
+alias c="clear"
 
 ### JS/Node
-alias npmr='npm run'
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 ## Python
-source $HOME/dev/venvs/dev-python2/bin/activate
-# source $HOME/dev/venvs/dev-python3/bin/activate
+# source $HOME/dev/venvs/dev-python2/bin/activate
+source $HOME/dev/venvs/dev-python3/bin/activate
 
 ## Ruby
 eval "$(rbenv init -)"
@@ -102,3 +107,5 @@ calc() {
 ## uninstall by removing these lines or running `tabtab uninstall sls`
 [[ -f /home/rick/node_modules/tabtab/.completions/sls.zsh ]] && . /home/rick/node_modules/tabtab/.completions/sls.zsh
 
+export PATH="/usr/local/bin:$PATH"
+export PATH="/usr/local/opt/qt@5.5/bin:$PATH"
