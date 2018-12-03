@@ -1,22 +1,11 @@
- // Place your settings in this file to overwrite the default settings
 {
   "editor.fontSize": 16,
-  // "editor.fontFamily": "Liberation Mono",
-  "editor.fontLigatures": true,
+  "editor.fontFamily": "Hack, monospace",
   "window.zoomLevel": 0,
-  "tslint.enable": true,
-  // "vim.useCtrlKeys": false,
-  "stylelint.enable": true,
-  "css.validate": false, // For Stylelint
-  "scss.validate": false, // For stylelint
   "workbench.sideBar.location": "left",
-  // "workbench.activityBar.visible": false,
-  // "sortImports.onSave": false,
   "workbench.editor.enablePreview": false,
   "editor.tabSize": 2,
-  "typescript.check.tscVersion": false,
   "files.exclude": {
     "**/node_modules": true
   }
-  // "vim.disableAnnoyingNeovimMessage": true
 }
