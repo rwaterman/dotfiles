@@ -14,8 +14,8 @@ setopt extended_glob # Enables extended globbing (expansion) features
 export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(vcs node_version)
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon context history time dir)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(vcs history)
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir)
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
 
 COMPLETION_WAITING_DOTS="true"
@@ -109,3 +109,5 @@ calc() {
 
 export PATH="/usr/local/bin:$PATH"
 export PATH="/usr/local/opt/qt@5.5/bin:$PATH"
+export PATH="$HOME/.rbenv/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"

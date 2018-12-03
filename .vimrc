@@ -205,15 +205,15 @@ nnoremap <Leader>fu :CtrlPFunky<Cr>
 nnoremap <Leader>fU :execute 'CtrlPFunky ' . expand('<cword>')<Cr>| " narrow the list down with a word under cursor
 let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
 
-Plug 'godlygeek/tabular'    " Tabulated Text Alignment Helper
-Plug 'dkprice/vim-easygrep' " Easy Grep
+" Plug 'godlygeek/tabular'    " Tabulated Text Alignment Helper
+" Plug 'dkprice/vim-easygrep' " Easy Grep
 Plug 'tpope/vim-commentary' " Support for easily toggling things.
 
-Plug 'tpope/vim-repeat'     " Repeat (.) functionality enhancement
+" Plug 'tpope/vim-repeat'     " Repeat (.) functionality enhancement
 
-Plug 'tpope/vim-surround'   " A character/tag surrounder
+" Plug 'tpope/vim-surround'   " A character/tag surrounder
 
-Plug 'tpope/vim-unimpaired' " Complementary Mapping pairs
+" Plug 'tpope/vim-unimpaired' " Complementary Mapping pairs
 
 Plug 'scrooloose/nerdtree' " File tree navigator and bookmarks
 map <C-n> :NERDTreeToggle<CR>
@@ -224,11 +224,11 @@ map <C-n> :NERDTreeToggle<CR>
 
 Plug 'junegunn/vim-pseudocl'           " A dependency for some Plug packages
 
-Plug 'junegunn/vim-oblique'            " Improved search and fuzzy searching
+" Plug 'junegunn/vim-oblique'            " Improved search and fuzzy searching
 
-Plug 'junegunn/goyo.vim'               " Distraction free mode
+" Plug 'junegunn/goyo.vim'               " Distraction free mode
 
-Plug 'keith/investigate.vim'           " Help assistant for looking up functions, etc.
+" Plug 'keith/investigate.vim'           " Help assistant for looking up functions, etc.
 
 Plug 'mbbill/undotree'
 if has("persistent_undo")
@@ -240,9 +240,9 @@ nnoremap <F5> :UndotreeToggle<cr>
 Plug 'Chiel92/vim-autoformat' " Autoformat code. See page for packages to install on your system.
 noremap <F3> :Autoformat<CR>
 
-Plug 'Valloric/MatchTagAlways'
+" Plug 'Valloric/MatchTagAlways'
 
-Plug 'junegunn/vim-easy-align' " Easily align content in text files in a tabulated fashion
+" Plug 'junegunn/vim-easy-align' " Easily align content in text files in a tabulated fashion
 
 " Start interactive EasyAlign in visual mode (e.g. vip<Enter>)
 vmap <Enter> <Plug>(EasyAlign)
@@ -286,7 +286,7 @@ let g:vim_json_syntax_conceal = 0
 
 Plug 'burnettk/vim-angular'     " AngularJS Syntax
 Plug 'moll/vim-node'            " NodeJS Syntax
-Plug 'kchmck/vim-coffee-script' " Coffeescript Syntax
+" Plug 'kchmck/vim-coffee-script' " Coffeescript Syntax
 
 
 " Markdown
@@ -295,14 +295,14 @@ Plug 'plasticboy/vim-markdown'
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_math = 1
 
-Plug 'wavded/vim-stylus'    " Stylus
+" Plug 'wavded/vim-stylus'    " Stylus
 
 Plug 'chrisbra/Colorizer' " Colors hex value colors
 let g:colorizer_auto_map   = 1
 let g:colorizer_auto_color = 1
 
 " ## PLUGINS: AUTO COMPLETION
-Plug 'mattn/emmet-vim'      " HTML tag expansion
+" Plug 'mattn/emmet-vim'      " HTML tag expansion
 
 call plug#end() " Add plugins to &runtimepath - PLUGINS - END
 
