@@ -108,6 +108,6 @@ calc() {
 [[ -f /home/rick/node_modules/tabtab/.completions/sls.zsh ]] && . /home/rick/node_modules/tabtab/.completions/sls.zsh
 
 export PATH="/usr/local/bin:$PATH"
-export PATH="/usr/local/opt/qt@5.5/bin:$PATH"
 export PATH="$HOME/.rbenv/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="/usr/local/opt/qt@5.5/bin:$PATH"
