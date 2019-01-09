@@ -1,10 +1,18 @@
 {
   "editor.fontSize": 16,
+  "editor.lineHeight": 0,
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "editor.fontWeight": "normal",
   "editor.fontFamily": "Hack, monospace",
   "window.zoomLevel": 0,
   "workbench.sideBar.location": "left",
   "workbench.editor.enablePreview": false,
   "editor.tabSize": 2,
+  "workbench.iconTheme": "eq-material-theme-icons-darker",
+  "vsicons.projectDetection.autoReload": true,
+  "workbench.colorTheme": "Atom One Dark",
   "files.exclude": {
     "**/node_modules": true
   }
