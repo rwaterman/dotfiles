@@ -75,9 +75,6 @@ export NVM_DIR="$HOME/.nvm"
 # source $HOME/dev/venvs/dev-python2/bin/activate
 source $HOME/dev/venvs/dev-python3/bin/activate
 
-## Ruby
-eval "$(rbenv init -)"
-
 # SYSTEM ADMINISTRATION
 ## Arch Linux
 ## Ubuntu Linux
@@ -109,5 +106,6 @@ calc() {
 
 export PATH="/usr/local/bin:$PATH"
 export PATH="/usr/local/opt/qt@5.5/bin:$PATH"
-export PATH="$HOME/.rbenv/bin:$PATH"
+export PATH="$HOME/.rbenv/bin:$PATH" && eval "$(rbenv init -)"
 export PATH="$HOME/.cargo/bin:$PATH"
+
