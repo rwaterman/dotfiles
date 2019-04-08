@@ -30,7 +30,6 @@ plugins=(
   git
   node
   npm
-  nvm-zsh
   python
   ruby
   tmux
@@ -63,7 +62,7 @@ export LESSOPEN="| $(which highlight) %s --out-format xterm256 --line-numbers --
 export LESS=" -R"
 alias less='less -m -N -g -i -J --line-numbers --underline-special'
 alias more='less'
-alias cat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style zenburn"
+alias cath="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style zenburn"
 alias c="clear"
 
 ### JS/Node
@@ -89,8 +88,9 @@ eval "$(rbenv init -)"
 #   [[ $(pacman -Q linux | cut -d " " -f 2) > $(uname -r) ]] && echo reboot
 # }
 ### Mac OS X
-alias brewme='brew update && brew upgrade && brew cleanup && brew prune'
+alias brewme='brew update && brew upgrade && brew cleanup'
 
+# Useful key bindings and fuzzy completion:
 # MISC CUSTOM FUNCTIONS
 ## calc(): A command line calculator using bc
 calc() {
@@ -111,3 +111,14 @@ export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/.rbenv/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="/usr/local/opt/qt@5.5/bin:$PATH"
+
+XZ_OPT=-t4
+# [[ -s "$HOME/.avn/bin/avn.sh" ]] && source "$HOME/.avn/bin/avn.sh" # load avn
+
+export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
+
+# tabtab source for slss package
+# uninstall by removing these lines or running `tabtab uninstall slss`
+[[ -f /Users/rick/.nvm/versions/node/v8.15.1/lib/node_modules/serverless/node_modules/tabtab/.completions/slss.zsh ]] && . /Users/rick/.nvm/versions/node/v8.15.1/lib/node_modules/serverless/node_modules/tabtab/.completions/slss.zsh
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
