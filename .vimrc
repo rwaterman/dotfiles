@@ -197,6 +197,7 @@ Plug 'kshenoy/vim-signature'   " Show marks
 " Plug 'bling/vim-bufferline' "airline plugin to show buffers on status line
 " let g:bufferline_rotate = 1
 
+Plug '/usr/local/opt/fzf'
 Plug 'ctrlpvim/ctrlp.vim'   " Ctrl+p and Ctrl+p funky are for fuzzy searching buffers and functions
 Plug 'tacahiroy/ctrlp-funky'
 let g:ctrlp_funky_syntax_highlight = 1
