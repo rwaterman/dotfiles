@@ -74,9 +74,6 @@ export NVM_DIR="$HOME/.nvm"
 # source $HOME/dev/venvs/dev-python2/bin/activate
 source $HOME/dev/venvs/dev-python3/bin/activate
 
-## Ruby
-eval "$(rbenv init -)"
-
 # SYSTEM ADMINISTRATION
 ## Arch Linux
 ## Ubuntu Linux
@@ -111,11 +108,8 @@ export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/.rbenv/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="/usr/local/opt/qt@5.5/bin:$PATH"
-
-XZ_OPT=-t4
-# [[ -s "$HOME/.avn/bin/avn.sh" ]] && source "$HOME/.avn/bin/avn.sh" # load avn
-
 export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
+XZ_OPT=-t4
 
 # tabtab source for slss package
 # uninstall by removing these lines or running `tabtab uninstall slss`
