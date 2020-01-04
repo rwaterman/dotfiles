@@ -172,7 +172,7 @@ map <leader>tm :tabmove
 
 " # PLUGINS
 call plug#begin('~/.vim/plugged') " Call vim-plug
-" Plug 'Valloric/YouCompleteMe'
+Plug 'Valloric/YouCompleteMe'
 " Plug 'vimwiki/vimwiki'
 
 " ## PLUGINS: STYLING
@@ -212,7 +212,7 @@ Plug 'tpope/vim-commentary' " Support for easily toggling things.
 
 " Plug 'tpope/vim-repeat'     " Repeat (.) functionality enhancement
 
-" Plug 'tpope/vim-surround'   " A character/tag surrounder
+Plug 'tpope/vim-surround'   " A character/tag surrounder
 
 " Plug 'tpope/vim-unimpaired' " Complementary Mapping pairs
 
@@ -241,9 +241,9 @@ nnoremap <F5> :UndotreeToggle<cr>
 Plug 'Chiel92/vim-autoformat' " Autoformat code. See page for packages to install on your system.
 noremap <F3> :Autoformat<CR>
 
-" Plug 'Valloric/MatchTagAlways'
+Plug 'Valloric/MatchTagAlways'
 
-" Plug 'junegunn/vim-easy-align' " Easily align content in text files in a tabulated fashion
+Plug 'junegunn/vim-easy-align' " Easily align content in text files in a tabulated fashion
 
 " Start interactive EasyAlign in visual mode (e.g. vip<Enter>)
 vmap <Enter> <Plug>(EasyAlign)
