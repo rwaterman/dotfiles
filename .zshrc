@@ -48,13 +48,13 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 ## PYTHON
-export PYTHON_CONFIGURE_OPTS="--enable-shared"
 export PATH="$HOME/.pyenv/bin:$PATH"
+export PYTHON_CONFIGURE_OPTS="--enable-shared"
 eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 
 ## RUBY
 export PATH="$HOME/.rbenv/bin:$PATH"
+export RUBY_CONFIGURE_OPTS="--disable-dtrace --with-readline-dir=$(brew --prefix readline)"
 
 ## RUST
 export PATH="$HOME/.cargo/bin:$PATH"
@@ -64,7 +64,6 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 export EDITOR='vim'
 export VISUAL=$EDITOR
-export AWS_PROFILE=rick
 
 ## ALIASES
 
@@ -104,3 +103,14 @@ alias cath="highlight $1 --out-format xterm256 --line-numbers --quiet --force --
 ## POST-INITIALIZATION
 stty -ixon # Prevent terminal freezing
 setopt extended_glob # Enables extended globbing (expansion) features
+source /usr/local/opt/powerlevel9k/powerlevel9k.zsh-theme
+
+# tabtab source for serverless package
+# uninstall by removing these lines or running `tabtab uninstall serverless`
+[[ -f /Users/rickwaterman/Documents/Github/legitscript/forge/node_modules/tabtab/.completions/serverless.zsh ]] && . /Users/rickwaterman/Documents/Github/legitscript/forge/node_modules/tabtab/.completions/serverless.zsh
+# tabtab source for sls package
+# uninstall by removing these lines or running `tabtab uninstall sls`
+[[ -f /Users/rickwaterman/Documents/Github/legitscript/forge/node_modules/tabtab/.completions/sls.zsh ]] && . /Users/rickwaterman/Documents/Github/legitscript/forge/node_modules/tabtab/.completions/sls.zsh
+# tabtab source for slss package
+# uninstall by removing these lines or running `tabtab uninstall slss`
+[[ -f /Users/rickwaterman/Documents/Github/legitscript/forge/node_modules/tabtab/.completions/slss.zsh ]] && . /Users/rickwaterman/Documents/Github/legitscript/forge/node_modules/tabtab/.completions/slss.zsh
