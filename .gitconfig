@@ -3,7 +3,6 @@
 	email = rwaterman+noreply@github.com
 [core]
 	editor = vim
-	excludesfile = /home/rick/.gitignore_global
 	autocrlf = input
 [github]
   user = rwaterman
