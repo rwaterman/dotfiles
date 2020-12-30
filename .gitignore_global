@@ -29,3 +29,7 @@ Desktop.ini
 # Miscellaneous #
 #################
 node_modules/
+
+
+# IntelliJ
+.idea/**/*
