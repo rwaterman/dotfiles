@@ -1,9 +1,10 @@
 [user]
 	name = Rick Waterman
-	email = rwaterman+noreply@github.com
+	email = rwaterman@users.noreply.github.com
 [core]
 	editor = vim
 	autocrlf = input
+	eol = input
 [github]
   user = rwaterman
   email = rwaterman@users.noreply.github.com
@@ -22,5 +23,6 @@
 	required = true
 [pull]
 	rebase = false
+	ff = only
 [init]
 	defaultBranch = main
