@@ -3,8 +3,8 @@
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
-  "editor.fontFamily": "Hack-Regular, monospace",
-  "window.zoomLevel": 0,
+  "editor.fontFamily": "MesloLGS NF, Menlo, Monaco, 'Courier New', monospace",
+  "window.zoomLevel": -1,
   "workbench.sideBar.location": "left",
   "workbench.editor.enablePreview": false,
   "editor.tabSize": 2,
@@ -23,5 +23,6 @@
   "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontWeightBold": "400",
   "workbench.fontAliasing": "auto",
-  "workbench.statusBar.feedback.visible": false
+  "workbench.statusBar.feedback.visible": false,
+  "editor.fontWeight": 500
 }

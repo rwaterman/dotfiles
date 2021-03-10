@@ -22,15 +22,16 @@ plugins=(
   git
   node
   npm
-  tmux
   wd
+  yarn
+  tmux
 )
 
 ## THEME
 ZSH_THEME="powerlevel10k/powerlevel10k"
 ## INIT
 source $ZSH/oh-my-zsh.sh
-
+export PATH="$HOME/bin:$PATH"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -53,34 +54,12 @@ ssh-add -l | grep "Loading SSH identities..." && ssh-add
 ### export CPPFLAGS="-I/usr/local/opt/openssl@1.1/include"
 ### export PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
 
-## IMAGEMAGICK (HOMEBREW)
-# export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
-### export LDFLAGS="-L/usr/local/opt/imagemagick@6/lib"
-### export CPPFLAGS="-I/usr/local/opt/imagemagick@6/include"
-### export PKG_CONFIG_PATH="/usr/local/opt/imagemagick@6/lib/pkgconfig"
-
-## MYSQL (HOMEBREW)
-### MYSQL (5.6)
-# export PATH="/usr/local/opt/mysql@5.6/bin:$PATH"
-# export LDFLAGS="-L/usr/local/opt/mysql@5.6/lib"
-# export CPPFLAGS="-I/usr/local/opt/mysql@5.6/include"
-# export PATH="/usr/local/opt/mysql@5.6/bin:$PATH"
-
-### MYSQL (5.7)
-# export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
-# export LDFLAGS="-L/usr/local/opt/mysql@5.7/lib"
-# export CPPFLAGS="-I/usr/local/opt/mysql@5.7/include"
-# export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
-
-## QT (HOMEBREW)
-# export PATH="/usr/local/opt/qt@5.5/bin:$PATH"
-
 ## JAVA
-[ -s "$HOME/.jabba/jabba.sh" ] && source "$HOME/.jabba/jabba.sh"
+# [ -s "$HOME/.jabba/jabba.sh" ] && source "$HOME/.jabba/jabba.sh"
 
 ## NODE/JS/TS
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 ## PYTHON
@@ -99,17 +78,6 @@ eval "$(rbenv init -)"
 
 ## assume-role
 alias assume-role='function(){eval $(command assume-role $@);}'
-
-## icu4c
-### export PATH="/usr/local/opt/icu4c/sbin:$PATH"
-### export LDFLAGS="-L/usr/local/opt/icu4c/lib"
-### export CPPFLAGS="-I/usr/local/opt/icu4c/include"
-### export PKG_CONFIG_PATH="/usr/local/opt/icu4c/lib/pkgconfig"
-
-## libffi
-### export LDFLAGS="-L/usr/local/opt/libffi/lib"
-### export CPPFLAGS="-I/usr/local/opt/libffi/include"
-### export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 
 # USER
 ## ENV
@@ -135,6 +103,7 @@ export LESS=" -R"
 alias less='less -m -N -g -i -J --line-numbers --underline-special'
 alias more='less'
 alias cath="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style zenburn"
+alias cht="$HOME/bin/cht.sh"
 
 ## FUNCTIONS
 ## calc(): A command line calculator using bc
@@ -153,3 +122,9 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+
+export MONO_GAC_PREFIX="/usr/local"
+
+# added by travis gem
+[ ! -s /Users/rwaterman/.travis/travis.sh ] || source /Users/rwaterman/.travis/travis.sh
