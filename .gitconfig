@@ -1,15 +1,16 @@
 [user]
 	name = Rick Waterman
-	email = rwaterman@users.noreply.github.com
+	email = rick.waterman@jupiterone.com
 [core]
 	editor = vim
 	autocrlf = input
 	eol = input
 [github]
   user = rwaterman
-  email = rwaterman@users.noreply.github.com
+  email = rick.waterman@jupiterone.com
 [push]
-	default = simple
+  followTags = true
+  default = current
 [color]
 	ui = auto
 [merge]
@@ -23,6 +24,5 @@
 	required = true
 [pull]
 	rebase = false
-	ff = only
 [init]
 	defaultBranch = main
