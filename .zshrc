@@ -68,9 +68,9 @@ export PYTHON_CONFIGURE_OPTS="--enable-shared"
 eval "$(pyenv init -)"
 
 # RUBY
-export PATH="$HOME/.rbenv/bin:$PATH"
-export RUBY_CONFIGURE_OPTS="--disable-dtrace --with-readline-dir=$(brew --prefix readline) --with-openssl-dir=$(brew --prefix openssl@1.1)"
-eval "$(rbenv init -)"
+# export PATH="$HOME/.rbenv/bin:$PATH"
+# export RUBY_CONFIGURE_OPTS="--disable-dtrace --with-readline-dir=$(brew --prefix readline) --with-openssl-dir=$(brew --prefix openssl@1.1)"
+# eval "$(rbenv init -)"
 
 # AWS CLI
 ## V1
@@ -91,8 +91,8 @@ alias c="clear"
 
 ## SYSTEM ADMINISTRATION
 alias aptUpgrade='sudo apt update && sudo apt upgrade -y'
-alias brewme='brew update && brew upgrade && brew cleanup'
-alias be='bundle exec'
+alias brewme='brew update && brew upgrade --greedy && brew cleanup'
+# alias be='bundle exec'
 
 ## FUZZY FINDER
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -123,11 +123,12 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-
-export MONO_GAC_PREFIX="/usr/local"
-
 # added by travis gem
-[ ! -s /Users/rwaterman/.travis/travis.sh ] || source /Users/rwaterman/.travis/travis.sh
+# [ ! -s /Users/rwaterman/.travis/travis.sh ] || source /Users/rwaterman/.travis/travis.sh
 
 autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /usr/local/bin/terraform terraform
+# complete -o nospace -C /usr/local/bin/terraform terraform
+HOMEBREW_NO_ENV_HINTS=true
+export PATH="/usr/local/opt/openjdk/bin:$PATH"
+
+eval $(thefuck --alias)

@@ -1,6 +1,6 @@
 [user]
 	name = Rick Waterman
-	email = rick.waterman@jupiterone.com
+	email = rwaterman@users.noreply.github.com
 [core]
 	editor = vim
 	autocrlf = input
