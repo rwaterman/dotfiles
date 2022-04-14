@@ -91,7 +91,7 @@ alias c="clear"
 
 ## SYSTEM ADMINISTRATION
 alias aptUpgrade='sudo apt update && sudo apt upgrade -y'
-alias brewme='brew update && brew upgrade --greedy && brew cleanup'
+alias brewme='brew update && brew upgrade && brew cleanup'
 # alias be='bundle exec'
 
 ## FUZZY FINDER
