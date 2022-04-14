@@ -2,7 +2,6 @@
 # @copyright MIT License
 # .zshrc
 
-
 # ENV - CORE
 export LANG='en_US.UTF-8' # Set system language to US English with UTF-8 character encoding
 export TERM='xterm-256color' # Turn on 256 colors (as opposed to 16) in the terminal
@@ -48,14 +47,9 @@ export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
 ssh-add -l | grep "Loading SSH identities..." && ssh-add
 
 # PROGRAM SETTINGS/OVERRIDES
-## OPENSSL
-# export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
-### export LDFLAGS="-L/usr/local/opt/openssl@1.1/lib"
-### export CPPFLAGS="-I/usr/local/opt/openssl@1.1/include"
-### export PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
-
 ## JAVA
-# [ -s "$HOME/.jabba/jabba.sh" ] && source "$HOME/.jabba/jabba.sh"
+[ -s "/Users/rick/.jabba/jabba.sh" ] && source "/Users/rick/.jabba/jabba.sh"
+
 
 ## NODE/JS/TS
 export NVM_DIR="$HOME/.nvm"
@@ -66,18 +60,12 @@ export NVM_DIR="$HOME/.nvm"
 export PATH="$HOME/.pyenv/bin:$PATH"
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
 eval "$(pyenv init -)"
+eval "$(pyenv init --path)"
 
 # RUBY
 # export PATH="$HOME/.rbenv/bin:$PATH"
 # export RUBY_CONFIGURE_OPTS="--disable-dtrace --with-readline-dir=$(brew --prefix readline) --with-openssl-dir=$(brew --prefix openssl@1.1)"
 # eval "$(rbenv init -)"
-
-# AWS CLI
-## V1
-# export PATH="/usr/local/opt/awscli@1/bin:$PATH"
-
-## assume-role
-alias assume-role='function(){eval $(command assume-role $@);}'
 
 # USER
 ## ENV
@@ -85,6 +73,20 @@ export EDITOR='vim'
 export VISUAL=$EDITOR
 
 ## ALIASES
+
+# NET
+alias whatismyip='curl ifconfig.me'
+alias pinggoogle="ping google.com -C 10"
+
+# Yarn
+alias yd='yarn dev'
+
+# Amplify
+alias ac='amplify codegen'
+alias am='amplify mock'
+alias apy='amplify push -y'
+alias ap='amplify push'
+alias afu='amplify function update'
 
 ## TERMINAL
 alias c="clear"
@@ -128,7 +130,9 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 
 autoload -U +X bashcompinit && bashcompinit
 # complete -o nospace -C /usr/local/bin/terraform terraform
-HOMEBREW_NO_ENV_HINTS=true
-export PATH="/usr/local/opt/openjdk/bin:$PATH"
+export HOMEBREW_NO_ENV_HINTS=true
 
 eval $(thefuck --alias)
+export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+
+AWS_PAGER=""
