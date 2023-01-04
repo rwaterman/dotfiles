@@ -83,20 +83,10 @@ alias pinggoogle="ping google.com -C 10"
 alias npml='npm run lint'
 alias npmt='npm run test'
 alias npmw='npm run watch'
-alias lv3='npm run link:v3'
-alias ulv3='npm run unlink:v3'
 alias slsol='sls offline -s local'
 alias slssol='sls offline start -s local'
-
-# Yarn
-alias yd='yarn dev'
-
-# Amplify (💀)
-# alias ac='amplify codegen'
-# alias am='amplify mock'
-# alias apy='amplify push -y'
-# alias ap='amplify push'
-# alias afu='amplify function update'
+alias rollup='npm run rollup'
+alias codegen='npm run codegen'
 
 ## TERMINAL
 alias c="clear"
