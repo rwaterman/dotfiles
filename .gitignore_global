@@ -30,6 +30,9 @@ Desktop.ini
 #################
 node_modules/
 
-
 # IntelliJ
-.idea/**/*
+.idea/
+
+# VS Code
+## History plugin
+.history/
