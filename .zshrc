@@ -136,6 +136,6 @@ export HOMEBREW_NO_ENV_HINTS=true
 export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 
 export AWS_PAGER=""
-alias tm='tmux new-session -A -s main'
+alias tm='tmux new-session -A -s default'
 
 eval "$(op completion zsh)"; compdef _op op
