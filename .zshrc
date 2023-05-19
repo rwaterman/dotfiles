@@ -27,6 +27,8 @@ plugins=(
   tmux
 )
 
+#
+
 ## THEME
 ZSH_THEME="powerlevel10k/powerlevel10k"
 ## INIT
@@ -87,6 +89,8 @@ alias slsol='sls offline -s local'
 alias slssol='sls offline start -s local'
 alias rollup='npm run rollup'
 alias codegen='npm run codegen'
+alias rm_node_modules="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
+alias rm_d_ts="find . -name '*.d.ts' -not -path './node_modules/*' -delete"
 
 ## TERMINAL
 alias c="clear"
@@ -125,9 +129,6 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# added by travis gem
-# [ ! -s /Users/rwaterman/.travis/travis.sh ] || source /Users/rwaterman/.travis/travis.sh
-
 autoload -U +X bashcompinit && bashcompinit
 # complete -o nospace -C /usr/local/bin/terraform terraform
 export HOMEBREW_NO_ENV_HINTS=true
@@ -136,6 +137,6 @@ export HOMEBREW_NO_ENV_HINTS=true
 export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 
 export AWS_PAGER=""
-alias tm='tmux new-session -A -s default'
+alias tm='tmux new-session -A -s alpha'
 
 eval "$(op completion zsh)"; compdef _op op
