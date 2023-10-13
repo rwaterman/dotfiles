@@ -11,7 +11,7 @@ export TERM='xterm-256color' # Turn on 256 colors (as opposed to 16) in the term
 export ZSH=$HOME/.oh-my-zsh
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="false"
-ZSH_TMUX_AUTOSTART="false"
+ZSH_TMUX_AUTOSTART="true"
 ZSH_TMUX_AUTOCONNECT="false"
 
 ## PLUGINS
@@ -19,6 +19,7 @@ plugins=(
   aws
   common-aliases
   docker
+  docker-compose
   git
   node
   npm
@@ -42,11 +43,11 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # SSH
-if [ ! -S ~/.ssh/ssh_auth_sock ]; then
+if [ ! -S ~/.1password/agent.sock ]; then
   eval `ssh-agent`
-  ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
+  ln -sf "$SSH_AUTH_SOCK" ~/.1password/agent.sock
 fi
-export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
+export SSH_AUTH_SOCK=~/.1password/agent.sock
 ssh-add -l | grep "Loading SSH identities..." && ssh-add
 
 # PROGRAM SETTINGS/OVERRIDES
@@ -81,6 +82,15 @@ export VISUAL=$EDITOR
 alias whatismyip='curl ifconfig.me'
 alias pinggoogle="ping google.com -C 10"
 
+# DOCKER
+alias boomshakalaka='find . -name "*.d.ts" -not -path "./node_modules/*" -print -delete && find . -name "node_modules" -type d -prune -print -exec rm -rfv "{}" + && find . -name ".idea" -type d -prune -print -exec rm -rfv "{}" +'
+alias shazam='
+  docker ps -a -q | xargs -r docker rm -f && 
+  docker volume ls -q | xargs -r docker volume rm &&
+  docker network ls --format "{{.Name}}" | grep -vE "^(bridge|host|none)$" | xargs -r docker network rm &&
+  docker images -q | xargs -r docker rmi -f
+'
+
 # NPM
 alias npml='npm run lint'
 alias npmt='npm run test'
@@ -91,6 +101,7 @@ alias rollup='npm run rollup'
 alias codegen='npm run codegen'
 alias rm_node_modules="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
 alias rm_d_ts="find . -name '*.d.ts' -not -path './node_modules/*' -delete"
+alias fme='npm ci && npm run build && npm run lint:fix'
 
 ## TERMINAL
 alias c="clear"
@@ -140,3 +151,8 @@ export AWS_PAGER=""
 alias tm='tmux new-session -A -s alpha'
 
 eval "$(op completion zsh)"; compdef _op op
+
+if command -v ngrok &>/dev/null; then
+  eval "$(ngrok completion)"
+fi
+

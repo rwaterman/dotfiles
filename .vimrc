@@ -163,6 +163,9 @@ map <leader>ss :call StripWhitespace()<cr>
 " Close the current buffer without closing all the tabs, too
 map <leader>bw :Bclose<cr>
 
+" Dont copy deleted text into the clipboard
+map <leader>dd "_dd
+
 " Useful mappings for managing tabs
 map <leader>tn :tabnew<cr>
 map <leader>to :tabonly<cr>
@@ -177,9 +180,10 @@ Plug 'Valloric/YouCompleteMe'
 
 " ## PLUGINS: STYLING
 Plug 'flazz/vim-colorschemes' " Colorschemes
-set t_ut= " Disabled Background Color Erase
-set t_Co=256 " Ensure Vim uses 256 colors
-set background=dark
+" set t_ut= " Disabled Background Color Erase
+" set t_Co=256 " Ensure Vim uses 256 colors
+" set background=dark
+set termguicolors
 
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes' " Pretty statuslines (patched Powerline fonts required)
