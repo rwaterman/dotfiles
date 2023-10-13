@@ -14,7 +14,7 @@
   ui = auto
 [merge]
   tool = vimdiff
-	ff = false
+	ff = true
 [pager]
   branch = false
 [filter "lfs"]
@@ -23,6 +23,6 @@
   process = git-lfs filter-process
   required = true
 [pull]
-  rebase = false
+  rebase = true
 [init]
   defaultBranch = main
