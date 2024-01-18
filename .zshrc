@@ -52,10 +52,16 @@ ssh-add -l | grep "Loading SSH identities..." && ssh-add
 
 # PROGRAM SETTINGS/OVERRIDES
 ## JAVA
-[ -s "/Users/rick/.jabba/jabba.sh" ] && source "/Users/rick/.jabba/jabba.sh"
+export JAVA_HOME=$(/usr/libexec/java_home)
 
+## Jabba (Java Switcher)
+[ -s "/opt/homebrew/opt/jabba/share/jabba/jabba.sh" ] && . "/opt/homebrew/opt/jabba/share/jabba/jabba.sh"
 
-## NODE/JS/TS
+## NODEJS/TS
+### ENV
+export NODE_OPTIONS=--max-old-space-size=16384
+
+### NVM
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
@@ -90,19 +96,25 @@ alias shazam='
   docker network ls --format "{{.Name}}" | grep -vE "^(bridge|host|none)$" | xargs -r docker network rm &&
   docker images -q | xargs -r docker rmi -f
 '
+# GIT
+alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
 
 # NPM
+alias npmr='npm run'
+alias npmb='npm run build'
+alias npmbf='npm run build:force'
 alias npml='npm run lint'
+alias npmlf='npm run lint:fix'
 alias npmt='npm run test'
 alias npmw='npm run watch'
 alias slsol='sls offline -s local'
 alias slssol='sls offline start -s local'
-alias rollup='npm run rollup'
+# alias rollup='npm run rollup'
 alias codegen='npm run codegen'
 alias rm_node_modules="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
 alias rm_d_ts="find . -name '*.d.ts' -not -path './node_modules/*' -delete"
-alias fme='npm ci && npm run build && npm run lint:fix'
-
+alias npmreset='npm ci && npm run build:force && npm run lint:fix'
+alias npmcipo='npm ci --prefer-offline'
 ## TERMINAL
 alias c="clear"
 
@@ -147,12 +159,12 @@ export HOMEBREW_NO_ENV_HINTS=true
 # eval $(thefuck --alias)
 export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 
+# AWS
 export AWS_PAGER=""
 alias tm='tmux new-session -A -s alpha'
 
-eval "$(op completion zsh)"; compdef _op op
+# eval "$(op completion zsh)"; compdef _op op
 
 if command -v ngrok &>/dev/null; then
   eval "$(ngrok completion)"
 fi
-
