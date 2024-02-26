@@ -5,6 +5,7 @@
   editor = vim
   autocrlf = input
   eol = input
+	excludesFile = ~/.gitignore_global
 [github]
   user = rwaterman
 [push]
@@ -23,6 +24,6 @@
   process = git-lfs filter-process
   required = true
 [pull]
-  rebase = true
+  rebase = false
 [init]
   defaultBranch = main

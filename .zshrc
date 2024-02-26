@@ -115,6 +115,7 @@ alias rm_node_modules="find . -name 'node_modules' -type d -prune -exec rm -rf '
 alias rm_d_ts="find . -name '*.d.ts' -not -path './node_modules/*' -delete"
 alias npmreset='npm ci && npm run build:force && npm run lint:fix'
 alias npmcipo='npm ci --prefer-offline'
+
 ## TERMINAL
 alias c="clear"
 
