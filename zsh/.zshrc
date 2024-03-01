@@ -79,8 +79,9 @@ eval "$(pyenv init --path)"
 
 # USER
 ## ENV
-export EDITOR='vim'
+export EDITOR='nvim'
 export VISUAL=$EDITOR
+alias nv='nvim'
 
 ## ALIASES
 
