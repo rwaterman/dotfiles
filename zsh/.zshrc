@@ -11,7 +11,7 @@ export TERM='xterm-256color' # Turn on 256 colors (as opposed to 16) in the term
 export ZSH=$HOME/.oh-my-zsh
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="false"
-ZSH_TMUX_AUTOSTART="true"
+ZSH_TMUX_AUTOSTART="false"
 ZSH_TMUX_AUTOCONNECT="false"
 
 ## PLUGINS
@@ -23,9 +23,10 @@ plugins=(
   git
   node
   npm
+  terraform
+  tmux
   wd
   yarn
-  tmux
 )
 
 #
@@ -43,12 +44,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # SSH
-if [ ! -S ~/.1password/agent.sock ]; then
-  eval `ssh-agent`
-  ln -sf "$SSH_AUTH_SOCK" ~/.1password/agent.sock
-fi
-export SSH_AUTH_SOCK=~/.1password/agent.sock
-ssh-add -l | grep "Loading SSH identities..." && ssh-add
+
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 
 # PROGRAM SETTINGS/OVERRIDES
 ## JAVA
@@ -72,11 +69,6 @@ export PYTHON_CONFIGURE_OPTS="--enable-shared"
 eval "$(pyenv init -)"
 eval "$(pyenv init --path)"
 
-# RUBY
-# export PATH="$HOME/.rbenv/bin:$PATH"
-# export RUBY_CONFIGURE_OPTS="--disable-dtrace --with-readline-dir=$(brew --prefix readline) --with-openssl-dir=$(brew --prefix openssl@1.1)"
-# eval "$(rbenv init -)"
-
 # USER
 ## ENV
 export EDITOR='nvim'
@@ -84,6 +76,13 @@ export VISUAL=$EDITOR
 alias nv='nvim'
 
 ## ALIASES
+
+# TERRAFORM
+alias tfplan='terraform plan -out="tfplan"'
+alias tfapply='terraform apply "tfplan"'
+alias tfdeploy='terraform fmt && terraform validate && tfplan && tfapply'
+alias tfdestroy='terraform plan -destroy -out="tfplan" && tfapply'
+alias tffv="terraform fmt && terraform validate"
 
 # NET
 alias whatismyip='curl ifconfig.me'
@@ -112,8 +111,8 @@ alias slsol='sls offline -s local'
 alias slssol='sls offline start -s local'
 # alias rollup='npm run rollup'
 alias codegen='npm run codegen'
-alias rm_node_modules="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
 alias rm_d_ts="find . -name '*.d.ts' -not -path './node_modules/*' -delete"
+alias rm_node_modules="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
 alias npmreset='npm ci && npm run build:force && npm run lint:fix'
 alias npmcipo='npm ci --prefer-offline'
 
@@ -123,7 +122,6 @@ alias c="clear"
 ## SYSTEM ADMINISTRATION
 alias aptUpgrade='sudo apt update && sudo apt upgrade -y'
 alias brewme='brew update && brew upgrade && brew cleanup'
-# alias be='bundle exec'
 
 ## FUZZY FINDER
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -146,27 +144,30 @@ calc() {
 
 # ADDITIONAL PROGRAM SETTINGS AND CONFIGURATION
 
-## POST-INITIALIZATION
+## MISC
 stty -ixon # Prevent terminal freezing
 setopt extended_glob # Enables extended globbing (expansion) features
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+## To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 autoload -U +X bashcompinit && bashcompinit
-# complete -o nospace -C /usr/local/bin/terraform terraform
+
 export HOMEBREW_NO_ENV_HINTS=true
 
-# eval $(thefuck --alias)
 export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
-
-# AWS
-export AWS_PAGER=""
-alias tm='tmux new-session -A -s alpha'
-
-# eval "$(op completion zsh)"; compdef _op op
 
 if command -v ngrok &>/dev/null; then
   eval "$(ngrok completion)"
 fi
+
+eval "$(zoxide init zsh)"
+
+
+## AWS
+export AWS_PAGER=""
+
+## TMUX
+alias tm='tmux new-session -A -s alpha'
+
