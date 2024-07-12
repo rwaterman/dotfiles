@@ -78,19 +78,18 @@ alias nv='nvim'
 ## ALIASES
 
 # TERRAFORM
+alias tffv="terraform fmt && terraform validate"
 alias tfplan='terraform plan -out="tfplan"'
 alias tfapply='terraform apply "tfplan"'
-alias tfdeploy='terraform fmt && terraform validate && tfplan && tfapply'
-alias tfdestroy='terraform plan -destroy -out="tfplan" && tfapply'
-alias tffv="terraform fmt && terraform validate"
+alias tfdeploy='tffv && tfplan && tfapply'
+alias tfdestroy='tffv && terraform plan -destroy -out="tfplan" && tfapply'
 
 # NET
 alias whatismyip='curl ifconfig.me'
-alias pinggoogle="ping google.com -C 10"
+alias check_ping="ping google.com -C 10"
 
 # DOCKER
-alias boomshakalaka='find . -name "*.d.ts" -not -path "./node_modules/*" -print -delete && find . -name "node_modules" -type d -prune -print -exec rm -rfv "{}" + && find . -name ".idea" -type d -prune -print -exec rm -rfv "{}" +'
-alias shazam='
+alias rm_docker_resources='
   docker ps -a -q | xargs -r docker rm -f && 
   docker volume ls -q | xargs -r docker volume rm &&
   docker network ls --format "{{.Name}}" | grep -vE "^(bridge|host|none)$" | xargs -r docker network rm &&
@@ -99,7 +98,7 @@ alias shazam='
 # GIT
 alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
 
-# NPM
+# NPM/NODEJS
 alias npmr='npm run'
 alias npmb='npm run build'
 alias npmbf='npm run build:force'
@@ -107,14 +106,17 @@ alias npml='npm run lint'
 alias npmlf='npm run lint:fix'
 alias npmt='npm run test'
 alias npmw='npm run watch'
-alias slsol='sls offline -s local'
-alias slssol='sls offline start -s local'
-# alias rollup='npm run rollup'
-alias codegen='npm run codegen'
-alias rm_d_ts="find . -name '*.d.ts' -not -path './node_modules/*' -delete"
-alias rm_node_modules="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
 alias npmreset='npm ci && npm run build:force && npm run lint:fix'
 alias npmcipo='npm ci --prefer-offline'
+
+alias slsol='sls offline -s local'
+alias slssol='sls offline start -s local'
+
+alias codegen='npm run codegen'
+
+alias rm_d_ts_files="find . -name '*.d.ts' -not -path './node_modules/*' -delete"
+alias rm_node_modules_dirs="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
+alias rm_idea_dirs='find . -name ".idea" -type d -prune -print -exec rm -rfv "{}" +'
 
 ## TERMINAL
 alias c="clear"
@@ -140,6 +142,28 @@ calc() {
   calc="${@//p/+}"
   calc="${calc//x/*}"
   bc -l <<<"scale=10;$calc"
+}
+
+run_with_timing() {
+    # Start time
+    start_time=$(date +%s)
+
+    # Run the command and capture its output
+    "$@"
+    cmd_status=$?
+
+    # End time
+    end_time=$(date +%s)
+
+    # Calculate the duration
+    duration=$((end_time - start_time))
+
+    # Print the command and the duration
+    echo "Command: $@"
+    echo "Execution time: ${duration}s"
+
+    # Return the status of the command
+    return $cmd_status
 }
 
 # ADDITIONAL PROGRAM SETTINGS AND CONFIGURATION
