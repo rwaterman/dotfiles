@@ -9,7 +9,7 @@
 [github]
   user = rwaterman
 [push]
-  followTags = true
+	followTags = true
   default = current
 [color]
   ui = auto

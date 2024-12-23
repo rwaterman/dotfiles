@@ -23,10 +23,14 @@ plugins=(
   git
   node
   npm
+  ngrok
+  pipenv
+  poetry
+  python
   terraform
   tmux
   wd
-  yarn
+  nvm
 )
 
 #
@@ -51,8 +55,8 @@ export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agen
 ## JAVA
 export JAVA_HOME=$(/usr/libexec/java_home)
 
-## Jabba (Java Switcher)
-[ -s "/opt/homebrew/opt/jabba/share/jabba/jabba.sh" ] && . "/opt/homebrew/opt/jabba/share/jabba/jabba.sh"
+## Jabba (Java Switcher) - Project looks abandoned, just using OS package manager or jenv
+# [ -s "/opt/homebrew/opt/jabba/share/jabba/jabba.sh" ] && . "/opt/homebrew/opt/jabba/share/jabba/jabba.sh"
 
 ## NODEJS/TS
 ### ENV
@@ -193,5 +197,21 @@ eval "$(zoxide init zsh)"
 export AWS_PAGER=""
 
 ## TMUX
-alias tm='tmux new-session -A -s alpha'
+alias tmg='tmux new-session -A -s gamma' # Primary sessions name
+alias tmt='tmux new-session -A -s tau'  # Secondary sessions name
 
+# bun completions
+[ -s "/Users/rick/.bun/_bun" ] && source "/Users/rick/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# >>> juliaup initialize >>>
+# !! Contents within this block are managed by juliaup !!
+# path=('/Users/rick/.juliaup/bin' $path)
+# export PATH
+# <<< juliaup initialize <<<
+
+setopt appendhistory
+setopt auto_cd
