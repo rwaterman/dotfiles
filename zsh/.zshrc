@@ -30,7 +30,6 @@ plugins=(
   terraform
   tmux
   wd
-  nvm
 )
 
 #
@@ -39,7 +38,8 @@ plugins=(
 ZSH_THEME="powerlevel10k/powerlevel10k"
 ## INIT
 source $ZSH/oh-my-zsh.sh
-export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH" # PATH Overrides
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -51,7 +51,12 @@ fi
 
 export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 
+
 # PROGRAM SETTINGS/OVERRIDES
+## CLANG/LLVM
+export CFLAGS="-O3 -mcpu=apple-m3"
+export CXXFLAGS="-O3 -mcpu=apple-m3"
+
 ## JAVA
 export JAVA_HOME=$(/usr/libexec/java_home)
 
@@ -60,7 +65,8 @@ export JAVA_HOME=$(/usr/libexec/java_home)
 
 ## NODEJS/TS
 ### ENV
-export NODE_OPTIONS=--max-old-space-size=16384
+export NODE_OPTIONS="--max-old-space-size=32768 --no-experimental-detect-module --no-experimental-require-module"
+JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION=true
 
 ### NVM
 export NVM_DIR="$HOME/.nvm"
@@ -215,3 +221,12 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 setopt appendhistory
 setopt auto_cd
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/rick/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
+#
+#
+
+
