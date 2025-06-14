@@ -34,18 +34,9 @@ plugins=(
 
 #
 
-## THEME
-ZSH_THEME="powerlevel10k/powerlevel10k"
 ## INIT
 source $ZSH/oh-my-zsh.sh
 export PATH="$HOME/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH" # PATH Overrides
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
 
 # SSH
 
@@ -181,10 +172,14 @@ run_with_timing() {
 ## MISC
 stty -ixon # Prevent terminal freezing
 setopt extended_glob # Enables extended globbing (expansion) features
-export PATH="/usr/local/opt/curl/bin:$PATH"
+export PATH="/usr/local/opt/curl/bin:$PATH" # Use Homebrew Curl instead of default
+
+# Config
+export XDG_CONFIG_HOME="$HOME/.config"
 
 ## To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+eval "$(oh-my-posh init zsh --config $(brew --prefix oh-my-posh)/themes/atomic.omp.json)"
 
 autoload -U +X bashcompinit && bashcompinit
 
@@ -206,13 +201,6 @@ export AWS_PAGER=""
 alias tmg='tmux new-session -A -s gamma' # Primary sessions name
 alias tmt='tmux new-session -A -s tau'  # Secondary sessions name
 
-# bun completions
-[ -s "/Users/rick/.bun/_bun" ] && source "/Users/rick/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
 # >>> juliaup initialize >>>
 # !! Contents within this block are managed by juliaup !!
 # path=('/Users/rick/.juliaup/bin' $path)
@@ -229,4 +217,6 @@ compinit
 #
 #
 
-
+# ATUIN
+. "$HOME/.atuin/bin/env"
+eval "$(atuin init zsh --disable-up-arrow)"
