@@ -74,7 +74,6 @@ eval "$(pyenv init --path)"
 ## ENV
 export EDITOR='nvim'
 export VISUAL=$EDITOR
-alias nv='nvim'
 
 ## ALIASES
 
@@ -98,6 +97,8 @@ alias rm_docker_resources='
 '
 # GIT
 alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
+alias gh_run_watch='gh run watch --compact && ntfy pub $NTFY_TOPIC "Success" || ntfy pub $NTFY_TOPIC "Failed"'
+
 
 # NPM/NODEJS
 alias npmr='npm run'
@@ -198,8 +199,8 @@ eval "$(zoxide init zsh)"
 export AWS_PAGER=""
 
 ## TMUX
-alias tmg='tmux new-session -A -s gamma' # Primary sessions name
-alias tmt='tmux new-session -A -s tau'  # Secondary sessions name
+alias tmg='tmux new-session -A -s main' # Primary sessions name
+alias tmt='tmux new-session -A -s secondary'  # Secondary sessions name
 
 # >>> juliaup initialize >>>
 # !! Contents within this block are managed by juliaup !!
@@ -220,3 +221,4 @@ compinit
 # ATUIN
 . "$HOME/.atuin/bin/env"
 eval "$(atuin init zsh --disable-up-arrow)"
+

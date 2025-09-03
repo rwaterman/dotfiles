@@ -6,6 +6,7 @@
   autocrlf = input
   eol = input
 	excludesFile = ~/.gitignore_global
+	pager = delta
 [github]
   user = rwaterman
 [push]
@@ -16,6 +17,7 @@
 [merge]
   tool = vimdiff
 	ff = true
+	conflictStyle = zdiff3
 [pager]
   branch = false
 [filter "lfs"]
@@ -26,4 +28,23 @@
 [pull]
   rebase = false
 [init]
-	defaultBranch = develop
+  defaultBranch = develop
+[alias]
+  merge-theirs = "!f() { \
+      if [ $# -ne 1 ]; then \
+          echo 'Usage: git merge-theirs <branch>'; \
+          exit 1; \
+      fi; \
+      b=\"$1\"; \
+        git merge --no-ff --no-commit \"$b\" && \
+        git restore --source=MERGE_HEAD --staged --worktree . && \
+        git clean -fd && \
+        git commit; \
+    }; f"
+  
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	side-by-side = true
+	line-numbers = true
