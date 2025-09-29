@@ -25,7 +25,6 @@ plugins=(
   npm
   ngrok
   pipenv
-  poetry
   python
   terraform
   tmux
