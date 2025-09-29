@@ -76,8 +76,8 @@ autocmd BufReadPost *
 " Enable Spell Check on certain file types
 au BufRead,BufNewFile *.md setlocal spell cc=0 nolist
 
-" Delete trailing white spaces for space sensitive file types
-au BufWrite *.py,*.coffee,*.jade :call StripWhitespace()
+" Delete trailing  spaces for space sensitive file types
+au BufWrite *.py,*.coffee,*.jade :call Stripspace()
 
 " Set the tab spacing to a different amount for these filetypes
 au BufRead,BufNewFile *.styl,*.jade setlocal inde=
@@ -106,8 +106,8 @@ function! <SID>BufcloseCloseIt()
   endif
 endfunction
 
-" Function to strip trailing whitespace
-function! StripWhitespace()
+" Function to strip trailing space
+function! Stripspace()
   let save_cursor = getpos(".")
   let old_query = getreg('/')
   :%s/\s\+$//e
@@ -155,10 +155,10 @@ nnoremap <silent> p p`]
 " Quickly select text I just pasted
 noremap gV `[v`]
 
-let mapleader=',' " Set the leader key to the ',' character
+let mapleader=' ' " Set the leader key to the ',' character
 
-" Clear whitespace quickly
-map <leader>ss :call StripWhitespace()<cr>
+" Clear space quickly
+map <leader>ss :call Stripspace()<cr>
 
 " Close the current buffer without closing all the tabs, too
 map <leader>bw :Bclose<cr>

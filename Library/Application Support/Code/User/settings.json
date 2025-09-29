@@ -1,0 +1,57 @@
+{
+  "editor.fontSize": 15,
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+"editor.fontFamily": "MesloLGS NF",
+  "workbench.sideBar.location": "left",
+  "workbench.editor.enablePreview": false,
+  "editor.tabSize": 2,
+  "window.nativeTabs": true,
+  "workbench.iconTheme": "vscode-icons",
+  "vsicons.projectDetection.autoReload": true,
+  "files.exclude": {
+    "**/node_modules": true
+  },
+  "vsicons.dontShowNewVersionMessage": true,
+  "editor.wordWrapColumn": 120,
+  "markdown.preview.lineHeight": 1,
+  "terminal.integrated.lineHeight": 0,
+  "editor.fontLigatures": true,
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.fontWeightBold": "400",
+  "workbench.fontAliasing": "auto",
+  "workbench.statusBar.feedback.visible": false,
+  "editor.fontWeight": 500,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.formatOnSaveMode": "modifications",
+  "editor.formatOnSave": true,
+  "cSpell.userWords": [
+    "upsert"
+  ],
+  "sort-imports.on-save": false,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "security.workspace.trust.untrustedFiles": "open",
+  "npm.keybindingsChangedWarningShown": true,
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "git.openRepositoryInParentFolders": "never",
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "workbench.startupEditor": "none",
+  "vs-kubernetes": {
+    "vscode-kubernetes.helm-path-mac": "/Users/rick/.vs-kubernetes/tools/helm/darwin-arm64/helm",
+    "vscode-kubernetes.minikube-path-mac": "/Users/rick/.vs-kubernetes/tools/minikube/darwin-arm64/minikube"
+  },
+  "editor.renderWhitespace": "all"
+}
