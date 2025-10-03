@@ -11,8 +11,8 @@ export TERM='xterm-256color' # Turn on 256 colors (as opposed to 16) in the term
 export ZSH=$HOME/.oh-my-zsh
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="false"
-ZSH_TMUX_AUTOSTART="false"
-ZSH_TMUX_AUTOCONNECT="false"
+ZSH_TMUX_AUTOSTART="true"
+ZSH_TMUX_AUTOCONNECT="true"
 
 ## PLUGINS
 plugins=(
@@ -76,6 +76,22 @@ export VISUAL=$EDITOR
 
 ## ALIASES
 
+## QUICK CONFIG ACCESS
+alias wez_config='nvim $HOME/.wezterm.lua'
+alias zsh_config='nvim $HOME/.zshrc'
+alias nvim_config='nvim $XDG_CONFIG_HOME/nvim/init.lua'
+
+# EDITORS
+alias v='nvim'
+
+# GIT
+alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
+alias gh_run_watch='gh run watch --compact && ntfy pub $NTFY_TOPIC "Success" || ntfy pub $NTFY_TOPIC "Failed"'
+
+## TMUX
+alias tmg='tmux new-session -A -s main' # Primary sessions name
+alias tmt='tmux new-session -A -s secondary'  # Secondary sessions name
+
 # TERRAFORM
 alias tffv="terraform fmt && terraform validate"
 alias tfplan='terraform plan -out="tfplan"'
@@ -83,21 +99,23 @@ alias tfapply='terraform apply "tfplan"'
 alias tfdeploy='tffv && tfplan && tfapply'
 alias tfdestroy='tffv && terraform plan -destroy -out="tfplan" && tfapply'
 
-# NET
+# INTERNET
 alias whatismyip='curl ifconfig.me'
 alias check_ping="ping google.com -C 10"
 
 # DOCKER
-alias rm_docker_resources='
+setopt appendhistory
+setopt auto_cd
+fpath=(/Users/rick/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+
+alias rm_docker_all='
   docker ps -a -q | xargs -r docker rm -f && 
   docker volume ls -q | xargs -r docker volume rm &&
   docker network ls --format "{{.Name}}" | grep -vE "^(bridge|host|none)$" | xargs -r docker network rm &&
   docker images -q | xargs -r docker rmi -f
 '
-# GIT
-alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
-alias gh_run_watch='gh run watch --compact && ntfy pub $NTFY_TOPIC "Success" || ntfy pub $NTFY_TOPIC "Failed"'
-
 
 # NPM/NODEJS
 alias npmr='npm run'
@@ -177,45 +195,29 @@ export PATH="/usr/local/opt/curl/bin:$PATH" # Use Homebrew Curl instead of defau
 # Config
 export XDG_CONFIG_HOME="$HOME/.config"
 
-## To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 eval "$(oh-my-posh init zsh --config $(brew --prefix oh-my-posh)/themes/atomic.omp.json)"
 
 autoload -U +X bashcompinit && bashcompinit
 
+## HOMEBREW
 export HOMEBREW_NO_ENV_HINTS=true
-
 export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 
 if command -v ngrok &>/dev/null; then
   eval "$(ngrok completion)"
 fi
 
+# ZOXIDE
 eval "$(zoxide init zsh)"
-
 
 ## AWS
 export AWS_PAGER=""
-
-## TMUX
-alias tmg='tmux new-session -A -s main' # Primary sessions name
-alias tmt='tmux new-session -A -s secondary'  # Secondary sessions name
 
 # >>> juliaup initialize >>>
 # !! Contents within this block are managed by juliaup !!
 # path=('/Users/rick/.juliaup/bin' $path)
 # export PATH
 # <<< juliaup initialize <<<
-
-setopt appendhistory
-setopt auto_cd
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/rick/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
-#
-#
 
 # ATUIN
 . "$HOME/.atuin/bin/env"
