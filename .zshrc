@@ -17,11 +17,12 @@ export TERM='xterm-256color'
 export XDG_CONFIG_HOME="$HOME/.config"
 
 #### OH MY ZSH #################################################################
+export PATH=$PATH:$HOME/.local/bin
 export ZSH="$HOME/.oh-my-zsh"
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="false"
-ZSH_TMUX_AUTOSTART="true"
-ZSH_TMUX_AUTOCONNECT="true"
+ZSH_TMUX_AUTOSTART="false"
+ZSH_TMUX_AUTOCONNECT="false"
 
 plugins=(
   aws
@@ -54,6 +55,7 @@ fi
 
 # User bin
 prepend_path "$HOME/bin"
+
 
 #### PROGRAM SETTINGS / OVERRIDES ##############################################
 # CLANG/LLVM flags (macOS Apple Silicon only)
@@ -165,7 +167,7 @@ if is_linux && have apt; then
 fi
 # Arch
 if is_linux && have pacman; then
-  alias pacUpgrade='sudo pacman -Syu --noconfirm'
+  alias pacme='sudo pacman -Syu --noconfirm'
 fi
 # Homebrew (macOS or Linuxbrew)
 if have brew; then
@@ -208,10 +210,7 @@ stty -ixon
 setopt extended_glob
 
 #### Shell/Prompt tooling (guarded) ############################################
-# Oh My Posh (via brew if present)
-if have brew && [ -f "$(brew --prefix)/bin/oh-my-posh" ]; then
-  eval "$(oh-my-posh init zsh --config "$(brew --prefix oh-my-posh)/themes/atomic.omp.json")"
-fi
+eval "$(oh-my-posh init zsh)"
 
 # Bash completion emulation (for tools that need it)
 autoload -U +X bashcompinit && bashcompinit
@@ -238,3 +237,4 @@ export AWS_PAGER=""
 # ATUIN (guarded)
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
 have atuin && eval "$(atuin init zsh --disable-up-arrow)"
+

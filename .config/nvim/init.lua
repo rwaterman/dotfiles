@@ -1,5 +1,4 @@
 -- theme & transparency
-vim.cmd.colorscheme("unokai")
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
 vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
@@ -292,3 +291,249 @@ vim.keymap.set("t", "<Esc>", function()
   end
 end,
 { noremap = true, silent = true, desc = "Close floating terminal from terminal mode" } )
+
+-- StatusLine
+local function git_branch()
+  local branch = vim.fn.system("git branch --show-current 2>/dev/null | tr -d '\n'")
+
+  if branch ~= "" then
+    return "  " .. branch .. "  "
+  end
+
+  return ""
+end
+
+-- File type with icon
+local function file_type()
+  local ft = vim.bo.filetype
+  local icons = {
+    lua = "[LUA]",
+    python = "[PY]",
+    javascript = "[JS]",
+    html = "[HTML]",
+    json = "[JSON]",
+    markdown = "[MD]",
+    sh = "[SH]",
+  }
+
+  if ft == "" then
+    return " "
+  end
+
+  return (icons[ft] or ft)
+end
+
+local function lsp_status()
+  local clients = vim.lsp.get_clients({ bufnr = 0 })
+  if #clients > 0 then
+    return "  LSP "
+  end
+  return ""
+end
+
+local function word_count()
+  local ft = vim.bo.filetype
+  if ft == "markdown" or ft == "text" or ft == "tex" then
+    local words = vim.fn.wordcount().words
+    return "  " .. words .. " words "
+  end
+  return ""
+end
+
+
+-- File size
+local function file_size()
+  local size = vim.fn.getfsize(vim.fn.expand('%'))
+  if size < 0 then return "" end
+  if size < 1024 then
+    return size .. "B "
+  elseif size < 1024 * 1024 then
+    return string.format("%.1fK", size / 1024)
+  else
+    return string.format("%.1fM", size / 1024 / 1024)
+  end
+end
+
+
+-- Mode indiciztors with icons
+local function mode_icon()
+  local mode = vim.fn.mode()
+  local modes = {
+    n = "NORMAL",
+    i = "INSERT",
+    v = "VISUAL",
+    V = "V-LINE",
+    ["\22"] = "V-BLOCK", -- Ctrl-V
+    c = "COMMAND",
+    s = "SELECT",
+    S = "S-LINE",
+    ["\19"] = "S-BLOCK",
+    R = "REPLACE",
+    r = "REPLACE",
+    ["!"] = "SHELL",
+    t = "TERMINAL",
+  }
+
+  return modes[mode] or " " .. mode:upper()
+end
+
+_G.mode_icon = mode_icon
+_G.git_branch = git_branch
+_G.file_type = file_type
+_G.file_size = file_size
+_G.lsp_status = lsp_status
+
+vim.cmd([[
+  highlight StatusLineBold gui=bold cterm=bold
+]])
+
+
+local function setup_dynamic_statusline()
+  vim.api.nvim_create_autocmd({"WinEnter", "BufEnter"}, {
+    callback = function()
+      vim.opt_local.statusline = table.concat {
+        " ",
+        "%#StatusLineBold#",
+        "%{v:lua.mode_icon()}",
+        "%#StatusLine#",
+        " | %f %h%m%r",
+        "%{v:lua.git_branch()}",
+        " | ",
+        "%{v:lua.file_type()}",
+        " | ",
+        "%{v:lua.file_size()}",
+        " | ",
+        "%{v:lua.lsp_status()}",
+        "%=",
+        "%l:%c %P ",
+      }
+    end
+  })
+  vim.api.nvim_set_hl(0, "StatusLineBold", { bold = true })
+
+  vim.api.nvim_create_autocmd({"WinLeave", "BufLeave" }, {
+    callback = function()
+      vim.opt_local.statusline = " %f %h%m%r | %{v:lua.file_type()} | %= %l%c  %P"
+    end
+  })
+end
+
+setup_dynamic_statusline()
+
+-- -- =======
+-- -- LSP From Scratch
+-- -- ========
+--
+-- -- Function to find project root
+-- local function find_root(patterns)
+--   local path = vim.fn.expand('%:p:h')
+--   local root = vim.fs.find(patterns, { path = path, upward = true})[1]
+--   return root and vim.fn.framemodify(root, ":h") or path
+-- end
+--
+-- -- Shell LSP Config
+-- local function setup_shell_lsp()
+--   vim.lsp.start({
+--     name = 'bashls',
+--     cmd = {'bash-language-server', 'start'},
+--     filetypes = {'sh', 'bash', 'zsh'},
+--     root_dir = find_root({'.git', 'Makefile'}),
+--     settings = {
+--       bashIde = {
+--         globPattern = "*@(.sh|.inc|.bash|.command)"
+--       }
+--     }
+--   })
+-- end
+
+-- TODO Setup Python LSP
+-- etc..
+
+-- Lazy
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
+end
+vim.opt.rtp:prepend(lazypath)
+
+-- Make sure to setup `mapleader` and `maplocalleader` before
+-- loading lazy.nvim so that mappings are correct.
+-- This is also a good place to setup other settings (vim.opt)
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+
+-- Setup lazy.nvim
+require("lazy").setup({
+  spec = {
+    -- add your plugins here
+    { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+    {
+      'nvim-telescope/telescope.nvim', tag = '0.1.8',
+      dependencies = { 'nvim-lua/plenary.nvim' }
+    },
+    { "nvim-treesitter/nvim-treesitter", branch = 'master', lazy = false, build = ":TSUpdate" },
+  },
+  -- Configure any other settings here. See the documentation for more details.
+  -- colorscheme that will be used when installing plugins.
+  install = { colorscheme = { "habamax" } },
+  -- automatically check for plugin updates
+  checker = { enabled = true },
+})
+
+vim.cmd.colorscheme "catppuccin"
+
+local builtin = require("telescope.builtin")
+vim.keymap.set("n", "<C-p>", builtin.find_files, {})
+vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
+
+local config = require("nvim-treesitter.configs")
+config.setup({
+  ensure_installed = { "bash", "lua", "python", "javascript", "typescript" },
+  highlight = { enable = true },
+  indent = { enable = true }
+})
+
+vim.opt.winborder = 'rounded'
+-- lsp
+
+-- This actually just enables the lsp servers.
+-- The configuration is found in the lsp folder inside the nvim config folder,
+-- so in ~.config/lsp/lua_ls.lua for lua_ls, for example.
+vim.lsp.enable('lua_ls')
+
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = augroup,
+  callback = function(ev)
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_completion) then
+      vim.opt.completeopt = { 'menu', 'menuone', 'noinsert', 'fuzzy', 'popup' }
+      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+      vim.keymap.set('i', '<C-Space>', function()
+        vim.lsp.completion.get()
+      end)
+    end
+  end,
+})
+
+-- Diagnostics
+vim.diagnostic.config({
+  -- Use the default configuration
+  -- virtual_lines = true
+
+  -- Alternatively, customize specific options
+  virtual_lines = {
+    -- Only show virtual line diagnostics for the current cursor line
+    current_line = true,
+  },
+})
