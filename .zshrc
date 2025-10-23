@@ -17,7 +17,7 @@ export TERM='xterm-256color'
 export XDG_CONFIG_HOME="$HOME/.config"
 
 #### OH MY ZSH #################################################################
-export PATH=$PATH:$HOME/.local/bin
+export PATH="$PATH:$HOME/brew/bin:$HOME/.local/bin"
 export ZSH="$HOME/.oh-my-zsh"
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="false"
