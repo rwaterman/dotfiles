@@ -1,2 +1,14 @@
 .idea/
 .DS_Store
+.config/nvim/lazy-lock.json
+
+# Ignore .config
+.config/
+# ...except...
+!.config/nvim/
+!.config/nvim/**
+
+# VS Code Application Support - ignore everything except settings.json
+# Ignore Library/ Application Support/Code, except the actual settings.json
+Library/Application Support/Code/
+!Library/Application Support/Code/User/settings.json
