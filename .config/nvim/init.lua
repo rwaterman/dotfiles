@@ -493,13 +493,19 @@ require("lazy").setup({
 
 vim.cmd.colorscheme "catppuccin"
 
+-- Telescope
 local builtin = require("telescope.builtin")
-vim.keymap.set("n", "<C-p>", builtin.find_files, {})
+vim.keymap.set("n", "<C-p>", function()
+  builtin.find_files({
+    hidden = false,
+    no_ignore = false,
+  })
+end, {})
 vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
 
 local config = require("nvim-treesitter.configs")
 config.setup({
-  ensure_installed = { "bash", "lua", "python", "javascript", "typescript" },
+  ensure_installed = { "bash", "lua", "go", "python", "java", "javascript", "typescript" },
   highlight = { enable = true },
   indent = { enable = true }
 })
