@@ -1,9 +1,10 @@
 {
+  "editor.fontFamily": "MesloLGLDZ Nerd Font, SF Mono, Ubuntu Mono, DejaVu Sans Mono",
   "editor.fontSize": 15,
+  "editor.lineHeight": 1.2,
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
-"editor.fontFamily": "MesloLGS NF",
   "workbench.sideBar.location": "left",
   "workbench.editor.enablePreview": false,
   "editor.tabSize": 2,
@@ -49,9 +50,6 @@
   "git.openRepositoryInParentFolders": "never",
   "github.copilot.nextEditSuggestions.enabled": true,
   "workbench.startupEditor": "none",
-  "vs-kubernetes": {
-    "vscode-kubernetes.helm-path-mac": "/Users/rick/.vs-kubernetes/tools/helm/darwin-arm64/helm",
-    "vscode-kubernetes.minikube-path-mac": "/Users/rick/.vs-kubernetes/tools/minikube/darwin-arm64/minikube"
-  },
-  "editor.renderWhitespace": "all"
+  "editor.renderWhitespace": "all",
+  "redhat.telemetry.enabled": false
 }

@@ -17,7 +17,7 @@ export TERM='xterm-256color'
 export XDG_CONFIG_HOME="$HOME/.config"
 
 #### OH MY ZSH #################################################################
-export PATH=$PATH:$HOME/.local/bin
+export PATH="$PATH:$HOME/brew/bin:$HOME/.local/bin"
 export ZSH="$HOME/.oh-my-zsh"
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="false"
@@ -34,7 +34,6 @@ plugins=(
   npm
   ngrok
   pipenv
-  poetry
   python
   terraform
   tmux
@@ -58,12 +57,37 @@ prepend_path "$HOME/bin"
 
 
 #### PROGRAM SETTINGS / OVERRIDES ##############################################
-# CLANG/LLVM flags (macOS Apple Silicon only)
+# ================================================================
+# Compiler Optimization Flags (auto-detect Apple Silicon M-series)
+# - macOS: Detect Apple Silicon generation (M1–M5)
+# - Linux: Use -march=native
+# ================================================================
+
 if is_macos; then
-  export CFLAGS="-O3 -mcpu=apple-m3"
-  export CXXFLAGS="-O3 -mcpu=apple-m3"
-else
-  # Reasonable default elsewhere
+  # Get CPU brand string (e.g. "Apple M3 Max")
+  local CHIP_NAME
+  CHIP_NAME="$(sysctl -n machdep.cpu.brand_string 2>/dev/null)"
+
+  # Default optimization
+  local CPU_FLAG="-O3"
+
+  # Normalize chip name (avoid case-sensitivity issues)
+  CHIP_NAME="${CHIP_NAME:u}"
+
+  # Match Apple Silicon generation
+  case "$CHIP_NAME" in
+    *"M1"*) CPU_FLAG="-O3 -mcpu=apple-m1" ;;
+    *"M2"*) CPU_FLAG="-O3 -mcpu=apple-m2" ;;
+    *"M3"*) CPU_FLAG="-O3 -mcpu=apple-m3" ;;
+    *"M4"*) CPU_FLAG="-O3 -mcpu=apple-m4" ;;
+    *"M5"*) CPU_FLAG="-O3 -mcpu=apple-m5" ;;
+    *)      CPU_FLAG="-O3 -mcpu=native" ;;  # fallback for Intel
+  esac
+
+  export CFLAGS="${CFLAGS:-$CPU_FLAG}"
+  export CXXFLAGS="${CXXFLAGS:-$CPU_FLAG}"
+
+elif is_linux; then
   export CFLAGS="${CFLAGS:--O3 -march=native}"
   export CXXFLAGS="${CXXFLAGS:--O3 -march=native}"
 fi
@@ -238,3 +262,4 @@ export AWS_PAGER=""
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
 have atuin && eval "$(atuin init zsh --disable-up-arrow)"
 
+export PATH="/Users/rick-sroa/brew/opt/postgresql@16/bin:$PATH"
