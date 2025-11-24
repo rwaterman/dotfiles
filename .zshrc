@@ -128,7 +128,7 @@ alias zsh_config='nvim $HOME/.zshrc'
 alias nvim_config='nvim $XDG_CONFIG_HOME/nvim/init.lua'
 
 # Editors
-alias v='nvim'
+alias vim='nvim'
 
 # Git
 alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
@@ -218,17 +218,6 @@ calc() {
   bc -l <<<"scale=10;$calc"
 }
 
-run_with_timing() {
-  local start_time end_time duration
-  start_time=$(date +%s)
-  "$@"; local cmd_status=$?
-  end_time=$(date +%s)
-  duration=$((end_time - start_time))
-  echo "Command: $*"
-  echo "Execution time: ${duration}s"
-  return $cmd_status
-}
-
 #### Misc Shell Tweaks #########################################################
 stty -ixon
 setopt extended_glob
@@ -262,4 +251,10 @@ export AWS_PAGER=""
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
 have atuin && eval "$(atuin init zsh --disable-up-arrow)"
 
-export PATH="/Users/rick-sroa/brew/opt/postgresql@16/bin:$PATH"
+export PATH="$HOME/brew/opt/postgresql@16/bin:$PATH"
+
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=($HOME/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
