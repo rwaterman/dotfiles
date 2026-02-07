@@ -20,7 +20,7 @@ config.line_height = 1.0
 
 -- Add Background Transparency
 -- config.front_end = "WebGpu"
-config.window_background_opacity = 0.90
+config.window_background_opacity = 0.95
 config.macos_window_background_blur = 5
 -- config.text_background_opacity = 0.9
 

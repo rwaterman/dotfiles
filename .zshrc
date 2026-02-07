@@ -103,8 +103,19 @@ if is_linux && [ -z "$JAVA_HOME" ]; then
   done
 fi
 
+# Shell / History Config
+export HISTSIZE=50000
+export SAVEHIST=50000
+setopt EXTENDED_HISTORY
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+
 # Node / TypeScript
-export NODE_OPTIONS="--max-old-space-size=16384 --no-experimental-detect-module --no-experimental-require-module"
+export NODE_OPTIONS="--max-old-space-size=8192 --no-experimental-detect-module --no-experimental-require-module"
 export JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION=true
 
 # NVM
@@ -123,12 +134,13 @@ export EDITOR='nvim'
 export VISUAL="$EDITOR"
 
 # Quick config
-alias wez_config='nvim $HOME/.wezterm.lua'
-alias zsh_config='nvim $HOME/.zshrc'
-alias nvim_config='nvim $XDG_CONFIG_HOME/nvim/init.lua'
+alias conf_wez='nvim $HOME/.wezterm.lua'
+alias conf_zsh='nvim $HOME/.zshrc'
+alias conf_nvim='nvim $XDG_CONFIG_HOME/nvim/init.lua'
 
 # Editors
 alias vim='nvim'
+alias v='nvim'
 
 # Git
 alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
@@ -185,17 +197,17 @@ alias rm_idea_dirs='find . -name ".idea" -type d -prune -print -exec rm -rfv "{}
 alias c="clear"
 
 #### System Admin (OS-aware) ###################################################
-# Debian/Ubuntu
-if is_linux && have apt; then
-  alias aptUpgrade='sudo apt update && sudo apt upgrade -y'
+# Homebrew (macOS or Linuxbrew)
+if have brew; then
+  alias brewme='brew update && brew upgrade && brew cleanup'
 fi
 # Arch
 if is_linux && have pacman; then
   alias pacme='sudo pacman -Syu --noconfirm'
 fi
-# Homebrew (macOS or Linuxbrew)
-if have brew; then
-  alias brewme='brew update && brew upgrade && brew cleanup'
+# Debian/Ubuntu
+if is_linux && have apt; then
+  alias aptUpgrade='sudo apt update && sudo apt upgrade -y'
 fi
 
 #### FZF #######################################################################
@@ -209,7 +221,6 @@ if have highlight; then
   alias more='less'
   alias cath="highlight \$1 --out-format xterm256 --line-numbers --quiet --force --style zenburn"
 fi
-alias cht="$HOME/bin/cht.sh"
 
 #### Functions #################################################################
 calc() {
@@ -228,11 +239,6 @@ eval "$(oh-my-posh init zsh)"
 # Bash completion emulation (for tools that need it)
 autoload -U +X bashcompinit && bashcompinit
 
-# Homebrew JAVA bin on macOS
-if is_macos; then
-  prepend_path "/opt/homebrew/opt/openjdk/bin"
-fi
-
 # ngrok completion
 if have ngrok; then
   eval "$(ngrok completion)"
@@ -244,14 +250,9 @@ have zoxide && eval "$(zoxide init zsh)"
 # AWS
 export AWS_PAGER=""
 
-# juliaup (left disabled as in original)
-# path=("$HOME/.juliaup/bin" $path); export PATH
-
 # ATUIN (guarded)
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
 have atuin && eval "$(atuin init zsh --disable-up-arrow)"
-
-export PATH="$HOME/brew/opt/postgresql@16/bin:$PATH"
 
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=($HOME/.docker/completions $fpath)
