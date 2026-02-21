@@ -138,6 +138,11 @@ alias conf_wez='nvim $HOME/.wezterm.lua'
 alias conf_zsh='nvim $HOME/.zshrc'
 alias conf_nvim='nvim $XDG_CONFIG_HOME/nvim/init.lua'
 
+# Core Utils
+# Safe mkdir default: create parents automatically.
+# `command` ensures the real binary is called, not this alias (prevents recursion).
+alias mkdir='command mkdir -p'
+
 # Editors
 alias vim='nvim'
 alias v='nvim'
