@@ -104,8 +104,8 @@ if is_linux && [ -z "$JAVA_HOME" ]; then
 fi
 
 # Shell / History Config
-export HISTSIZE=50000
-export SAVEHIST=50000
+export HISTSIZE=100000
+export SAVEHIST=100000
 setopt EXTENDED_HISTORY
 setopt INC_APPEND_HISTORY
 setopt SHARE_HISTORY
