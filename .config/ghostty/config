@@ -1,0 +1,76 @@
+# =========================================================
+#  Ghostty Config
+#  Converted from WezTerm — place at ~/.config/ghostty/config
+# =========================================================
+
+# ---------------------------------------------------------
+#  Appearance
+# ---------------------------------------------------------
+
+# "Builtin Tango Dark" is Ghostty's closest match to
+# WezTerm's "Tango (terminal.sexy)".
+# Run `ghostty +list-themes` to browse alternatives interactively.
+theme = Builtin Tango Dark
+
+# Font — each repeated font-family line acts as a fallback
+font-family         = MesloLGLDZ Nerd Font
+font-family         = SF Mono
+font-family         = Ubuntu Mono
+font-family         = DejaVu Sans Mono
+
+font-size           = 14
+
+# line_height = 1.0 is the default in Ghostty, so no adjustment needed.
+# If you ever want to tweak it, use: adjust-cell-height = <points or %>
+
+# Background transparency + blur
+background-opacity  = 0.95
+background-blur     = 5
+
+# ---------------------------------------------------------
+#  macOS Option Key Behavior
+# ---------------------------------------------------------
+# Makes both Option keys send raw ESC sequences (like Alt)
+# instead of macOS composed characters (accents, etc.)
+# Equivalent to WezTerm's send_composed_key_when_*_alt_is_pressed = false
+macos-option-as-alt = true
+
+# ---------------------------------------------------------
+#  Keybinds — Natural Text Editing
+# ---------------------------------------------------------
+# NOTE: Ghostty on macOS already includes most of these as
+# defaults (opt+arrows, cmd+arrows, opt+delete). They're
+# listed explicitly here so behavior is guaranteed across
+# versions and matches your WezTerm config exactly.
+
+# Word navigation (alt+arrow → esc:b / esc:f)
+keybind = alt+left=text:\x1bb
+keybind = alt+right=text:\x1bf
+
+# Line navigation (cmd+arrow → ctrl+a / ctrl+e)
+keybind = cmd+left=text:\x01
+keybind = cmd+right=text:\x05
+
+# Delete word backward / forward
+# Use alt+ instead of opt+ since macos-option-as-alt = true
+# remaps Option to Alt at the input level
+keybind = alt+backspace=text:\x1b\x7f
+keybind = alt+delete=text:\x1bd
+
+# Delete to start / end of line
+keybind = cmd+backspace=text:\x15
+keybind = cmd+delete=text:\x0b
+
+# ---------------------------------------------------------
+#  Mouse / Selection
+# ---------------------------------------------------------
+# Copies selection to system clipboard on mouse-up,
+# matching WezTerm's CompleteSelectionOrOpenLinkAtMouseCursor
+copy-on-select = clipboard
+
+# ---------------------------------------------------------
+#  URL / Link Handling
+# ---------------------------------------------------------
+# Ghostty detects and renders clickable URLs by default
+# (cmd+click to open). No extra config needed — equivalent
+# to WezTerm's default_hyperlink_rules().
