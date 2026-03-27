@@ -80,7 +80,7 @@ if is_macos; then
     *"M2"*) CPU_FLAG="-O3 -mcpu=apple-m2" ;;
     *"M3"*) CPU_FLAG="-O3 -mcpu=apple-m3" ;;
     *"M4"*) CPU_FLAG="-O3 -mcpu=apple-m4" ;;
-    *"M5"*) CPU_FLAG="-O3 -mcpu=apple-m5" ;;
+    # *"M5"*) CPU_FLAG="-O3 -mcpu=apple-m5" ;; # TODO: Check back later. No apple-m5 is available yet.
     *)      CPU_FLAG="-O3 -mcpu=native" ;;  # fallback for Intel
   esac
 
@@ -119,9 +119,6 @@ export NODE_OPTIONS="--max-old-space-size=8192 --no-experimental-detect-module -
 export JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION=true
 
 # NVM
-export NVM_DIR="$HOME/.nvm"
-source_if_exists "$NVM_DIR/nvm.sh"
-source_if_exists "$NVM_DIR/bash_completion"
 
 # Python / pyenv
 prepend_path "$HOME/.pyenv/bin"
@@ -264,3 +261,7 @@ fpath=($HOME/.docker/completions $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

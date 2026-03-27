@@ -13,7 +13,7 @@
 theme = Builtin Tango Dark
 
 # Font — each repeated font-family line acts as a fallback
-font-family         = MesloLGLDZ Nerd Font
+font-family         = MesloLGLDZ Nerd Font Mono
 font-family         = SF Mono
 font-family         = Ubuntu Mono
 font-family         = DejaVu Sans Mono
@@ -26,6 +26,21 @@ font-size           = 14
 # Background transparency + blur
 background-opacity  = 0.95
 background-blur     = 5
+
+# ---------------------------------------------------------
+#  Custom Shaders
+# ---------------------------------------------------------
+# Cursor animation shader — clone your preferred shaders into
+# ~/.config/ghostty/shaders/ and reference them here.
+# Popular repos:
+#   https://github.com/sahaj-b/ghostty-cursor-shaders (trails, ripples)
+#   https://github.com/0xhckr/ghostty-shaders (CRT, bloom, etc.)
+#
+custom-shader = shaders/cursor_warp.glsl
+# custom-shader = shaders/cursor_sweep.glsl
+#
+# Keep animations running even when the window loses focus:
+# custom-shader-animation = always
 
 # ---------------------------------------------------------
 #  macOS Option Key Behavior
@@ -43,19 +58,20 @@ macos-option-as-alt = true
 # listed explicitly here so behavior is guaranteed across
 # versions and matches your WezTerm config exactly.
 
-# Word navigation (alt+arrow → esc:b / esc:f)
-keybind = alt+left=text:\x1bb
-keybind = alt+right=text:\x1bf
+# Word navigation (opt+arrow → esc:b / esc:f)
+keybind = opt+left=text:\x1bb
+keybind = opt+right=text:\x1bf
 
 # Line navigation (cmd+arrow → ctrl+a / ctrl+e)
 keybind = cmd+left=text:\x01
 keybind = cmd+right=text:\x05
 
 # Delete word backward / forward
-# Use alt+ instead of opt+ since macos-option-as-alt = true
-# remaps Option to Alt at the input level
-keybind = alt+backspace=text:\x1b\x7f
-keybind = alt+delete=text:\x1bd
+# Ghostty 1.2+ requires opt+ (not alt+) for Option key on macOS,
+# even with macos-option-as-alt = true.
+# \x17 = Ctrl+W (backward-kill-word), more portable than \x1b\x7f
+keybind = opt+backspace=text:\x17
+keybind = opt+delete=text:\x1bd
 
 # Delete to start / end of line
 keybind = cmd+backspace=text:\x15
