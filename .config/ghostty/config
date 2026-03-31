@@ -90,3 +90,6 @@ copy-on-select = clipboard
 # Ghostty detects and renders clickable URLs by default
 # (cmd+click to open). No extra config needed — equivalent
 # to WezTerm's default_hyperlink_rules().
+
+# Run Tmux
+command = shell:"$HOME/brew/bin/tmux" new-session -A -s main
