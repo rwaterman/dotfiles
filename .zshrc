@@ -231,6 +231,34 @@ calc() {
   bc -l <<<"scale=10;$calc"
 }
 
+# SSH login log viewer
+# Usage: ssh_log [days]   (default: 7)
+ssh_log() {
+  local days="${1:-7}"
+  local pattern="Accepted|Failed|Invalid user|Disconnected|Connection closed"
+
+  if is_macos; then
+    log show --predicate 'process == "sshd"' --last "${days}d" --info \
+      | grep -E "$pattern"
+
+  elif is_linux; then
+    # Prefer journald if available, fall back to auth.log
+    if have journalctl; then
+      journalctl -u ssh --since "${days} days ago" \
+        | grep -E "$pattern"
+    elif [ -f /var/log/auth.log ]; then
+      grep -E "$pattern" /var/log/auth.log \
+        | awk -v cutoff="$(date -d "${days} days ago" '+%b %e')" '$0 >= cutoff'
+    else
+      echo "ssh_log: no log source found (tried journald, /var/log/auth.log)" >&2
+      return 1
+    fi
+  else
+    echo "ssh_log: unsupported OS" >&2
+    return 1
+  fi
+}
+
 #### Misc Shell Tweaks #########################################################
 stty -ixon
 setopt extended_glob
