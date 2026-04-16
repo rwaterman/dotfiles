@@ -24,7 +24,7 @@ font-size           = 14
 # If you ever want to tweak it, use: adjust-cell-height = <points or %>
 
 # Background transparency + blur
-background-opacity  = 0.95
+background-opacity  = 0.80
 background-blur     = 5
 
 # ---------------------------------------------------------

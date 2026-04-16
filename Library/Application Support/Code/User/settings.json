@@ -53,5 +53,6 @@
   "editor.renderWhitespace": "all",
   "redhat.telemetry.enabled": false,
   "editor.accessibilitySupport": "off",
-  "workbench.colorTheme": "Atom One Dark"
+  "workbench.colorTheme": "Atom One Dark",
+  "window.autoDetectColorScheme": true
 }
