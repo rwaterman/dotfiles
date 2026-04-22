@@ -277,8 +277,9 @@ fi
 # zoxide
 have zoxide && eval "$(zoxide init zsh)"
 
-# AWS
+# Pagers
 export AWS_PAGER=""
+export PAGER=""
 
 # ATUIN (guarded)
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
