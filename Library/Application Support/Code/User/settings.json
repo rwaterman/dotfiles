@@ -1,7 +1,6 @@
 {
-  "editor.fontFamily": "MesloLGLDZ Nerd Font, SF Mono, Ubuntu Mono, DejaVu Sans Mono",
-  "editor.fontSize": 15,
-  "editor.lineHeight": 1.2,
+  "editor.fontFamily": "MesloLGMDZ Nerd Font Mono",
+  "editor.fontSize": 14,
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
@@ -16,25 +15,23 @@
   },
   "vsicons.dontShowNewVersionMessage": true,
   "editor.wordWrapColumn": 120,
-  "markdown.preview.lineHeight": 1,
+  "markdown.preview.lineHeight": 1.1,
   "terminal.integrated.lineHeight": 0,
   "editor.fontLigatures": true,
-  "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontWeightBold": "400",
   "workbench.fontAliasing": "auto",
   "workbench.statusBar.feedback.visible": false,
-  "editor.fontWeight": 500,
+  "editor.fontWeight": "normal",
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "editor.formatOnSaveMode": "modifications",
-  "editor.formatOnSave": true,
   "cSpell.userWords": [
     "upsert"
   ],
   "sort-imports.on-save": false,
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   "security.workspace.trust.untrustedFiles": "open",
   "npm.keybindingsChangedWarningShown": true,
@@ -44,15 +41,22 @@
     "markdown": false,
     "scminput": false
   },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
   "git.openRepositoryInParentFolders": "never",
   "github.copilot.nextEditSuggestions.enabled": true,
   "workbench.startupEditor": "none",
   "editor.renderWhitespace": "all",
   "redhat.telemetry.enabled": false,
   "editor.accessibilitySupport": "off",
-  "workbench.colorTheme": "Atom One Dark",
-  "window.autoDetectColorScheme": true
+  "workbench.colorTheme": "Monokai Dimmed",
+  "window.autoDetectColorScheme": true,
+  "chat.viewSessions.orientation": "stacked",
+  "files.autoSave": "afterDelay",
+  "editor.formatOnSave": true,
+  "chat.agent.maxRequests": 75,
+  "workbench.preferredDarkColorTheme": "Atom One Dark",
+  "chat.unifiedAgentsBar.enabled": true,
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.fontWeight": "normal",
+  "aws.cloudformation.telemetry.enabled": false,
+  "aws.telemetry": false
 }
