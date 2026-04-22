@@ -7,6 +7,7 @@
 .config/nvim/lazy-lock.json
 .config/ghostty/shaders
 !.config/ghostty/
+!.claude/
 
 # VS Code Application Support - ignore everything except settings.json
 # Ignore Library/ Application Support/Code, except the actual settings.json
