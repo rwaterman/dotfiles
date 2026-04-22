@@ -277,8 +277,9 @@ fi
 # zoxide
 have zoxide && eval "$(zoxide init zsh)"
 
-# AWS
+# Pagers
 export AWS_PAGER=""
+export PAGER=""
 
 # ATUIN (guarded)
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
@@ -293,3 +294,12 @@ compinit
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+# Make pastes atomic — disables expansion/completion mid-paste
+autoload -Uz bracketed-paste-magic
+zle -N bracketed-paste bracketed-paste-magic
+
+# Tell zsh-autosuggestions to clear its suggestion when a paste starts
+# (prevents the "ghost text gets inserted into the paste" interleave)
+ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(bracketed-paste)
