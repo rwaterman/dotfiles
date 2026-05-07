@@ -63,5 +63,9 @@
   "gitlens.ai.vscode.model": "copilot:gpt-4.1",
   "chat.tools.terminal.autoApprove": {
     "npx jest": true
-  }
+  },
+  "github.copilot.chat.agent.autoFix": true,
+  "github.copilot.chat.claude47OpusPrompt.enabled": true,
+  "github.copilot.chat.githubMcpServer.enabled": true,
+  "github.copilot.chat.switchAgent.enabled": true
 }

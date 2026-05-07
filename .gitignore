@@ -1,12 +1,15 @@
 .idea/
 .DS_Store
 
-# Ignore .config except nvim and ghostty
+# Ignore .config except nvim, ghostty, and github-copilot
 .config/*
 !.config/nvim/
 .config/nvim/lazy-lock.json
 .config/ghostty/shaders
 !.config/ghostty/
+!.config/github-copilot/
+.config/github-copilot/*
+!.config/github-copilot/intellij/
 !.claude/
 
 # VS Code Application Support - ignore everything except settings.json
