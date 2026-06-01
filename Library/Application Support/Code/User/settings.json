@@ -67,5 +67,6 @@
   "github.copilot.chat.agent.autoFix": true,
   "github.copilot.chat.claude47OpusPrompt.enabled": true,
   "github.copilot.chat.githubMcpServer.enabled": true,
-  "github.copilot.chat.switchAgent.enabled": true
+  "github.copilot.chat.switchAgent.enabled": true,
+  "claudeCode.preferredLocation": "panel"
 }
