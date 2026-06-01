@@ -3,14 +3,30 @@
 
 # Ignore .config except nvim, ghostty, and github-copilot
 .config/*
-!.config/nvim/
-.config/nvim/lazy-lock.json
+!.config/nvim
+!.config/nvim-kick
+!.config/nvim-lazyvim
+!.config/nvim-nvchad
+!.config/atuin
+!.config/chemacs
+!.config/doom
+!.config/emacs-personal
+!.config/emacs-doom
+!.config/emacs-kick
 .config/ghostty/shaders
 !.config/ghostty/
+!.claude/
+
+lazy-lock.json
+
+# GitHub Copilot (IntelliJ global instructions symlink)
 !.config/github-copilot/
 .config/github-copilot/*
 !.config/github-copilot/intellij/
-!.claude/
+
+# Emacs/Doom generated files (Doom private dir is dir-symlinked into the repo)
+.config/doom/custom.el
+.config/doom/.local/
 
 # VS Code Application Support - ignore everything except settings.json
 # Ignore Library/ Application Support/Code, except the actual settings.json

@@ -1,0 +1,28 @@
+# ~/.claude is a folded symlink into this repo, so Claude Code writes ALL of its
+# runtime state here: session transcripts, shell-env snapshots, config backups
+# (.claude.json contains OAuth tokens), prompt history, caches, IDE lockfiles.
+# Much of it is machine-local and some contains secrets.
+#
+# Posture: default-deny. Ignore everything, then re-include only curated config.
+# This stays safe even when a future Claude Code version writes a new artifact
+# type we haven't seen yet.
+
+# Ignore everything...
+*
+# ...but let git descend into directories so curated nested files are reachable
+# (e.g. skills/<name>/SKILL.md). Files inside runtime dirs stay ignored because
+# nothing below re-includes them.
+!*/
+
+# Curated, version-controlled config (anchored to .claude/ root with a leading
+# slash so a stray same-named file in a runtime dir can't be un-ignored).
+!/.gitignore
+!/CLAUDE.md
+!/CONNECTORS.md
+!/settings.json
+!/agents/**
+!/commands/**
+!/skills/**
+
+# Explicitly machine-local (kept ignored even if a rule above ever loosens):
+#   settings.local.json  - per-machine permission overrides (Claude Code convention)
