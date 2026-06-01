@@ -17,7 +17,7 @@ export TERM='xterm-256color'
 export XDG_CONFIG_HOME="$HOME/.config"
 
 #### OH MY ZSH #################################################################
-export PATH="$PATH:$HOME/brew/bin:$HOME/.local/bin"
+export PATH="$HOME/brew/bin:$HOME/.local/bin:$PATH"
 export ZSH="$HOME/.oh-my-zsh"
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="false"
@@ -127,8 +127,28 @@ have pyenv && eval "$(pyenv init -)"
 have pyenv && eval "$(pyenv init --path)"
 
 #### USER PREFS #################################################################
+
+# Editors
 export EDITOR='nvim'
 export VISUAL="$EDITOR"
+
+alias vim='nvim'
+alias v='nvim'
+alias e='emacs'
+
+# Neovim profile switcher (NVIM_APPNAME)
+# Each entry maps a short name -> ~/.config/<dir>
+declare -A NVIM_PROFILES
+NVIM_PROFILES=(
+  [personal]="nvim"
+  [lazyvim]="nvim-lazyvim"
+  [nvchad]="nvim-nvchad"
+  [kick]="nvim-kick"
+)
+nvim-personal() { NVIM_APPNAME=nvim nvim "$@"; }
+nvim-lazyvim()  { NVIM_APPNAME=nvim-lazyvim nvim "$@"; }
+nvim-nvchad()   { NVIM_APPNAME=nvim-nvchad nvim "$@"; }
+nvim-kick()     { NVIM_APPNAME=nvim-kick nvim "$@"; }
 
 # Quick config
 alias conf_wez='nvim $HOME/.wezterm.lua'
@@ -140,13 +160,73 @@ alias conf_nvim='nvim $XDG_CONFIG_HOME/nvim/init.lua'
 # `command` ensures the real binary is called, not this alias (prevents recursion).
 alias mkdir='command mkdir -p'
 
-# Editors
-alias vim='nvim'
-alias v='nvim'
+# fzf picker — launches chosen profile with any extra args
+nvims() {
+  local profile dir
+  profile=$(printf '%s\n' "${(@k)NVIM_PROFILES}" | sort | fzf --prompt="nvim profile: " --height=10)
+  [[ -z "$profile" ]] && return
+  dir="${NVIM_PROFILES[$profile]}"
+  NVIM_APPNAME="$dir" nvim "$@"
+}
 
 # Git
 alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
 alias gh_run_watch='gh run watch --compact && ntfy pub $NTFY_TOPIC "Success" || ntfy pub $NTFY_TOPIC "Failed"'
+
+# Sync all fork submodules with their upstreams ("Sync fork").
+#   sync-forks            fetch upstream -> merge -> push fork -> stage parent pointers
+#   sync-forks --dry-run  preview only; no merge, no push
+# Conflicts are aborted (never left half-applied) and reported for manual sync.
+sync-forks() {
+  emulate -L zsh
+  local root="$HOME/git/github/rwaterman/dotfiles"
+  local dry=0; [[ "$1" == "--dry-run" || "$1" == "-n" ]] && dry=1
+  [[ -d "$root/.git" ]] || { print -u2 "sync-forks: $root not found"; return 1 }
+
+  local path sub branch n tag="" line
+  local -a lines paths updated current conflict noupstream
+  lines=(${(f)"$(git -C "$root" config -f "$root/.gitmodules" --get-regexp '\.path$')"})
+  for line in $lines; do paths+=("${line##* }"); done
+
+  for path in $paths; do
+    sub="$root/$path"
+    git -C "$sub" remote get-url upstream >/dev/null 2>&1 || { noupstream+=("$path"); continue }
+    branch=$(git -C "$sub" symbolic-ref --short -q HEAD)
+    if [[ -z "$branch" ]]; then
+      branch=$(git -C "$root" config -f "$root/.gitmodules" --get "submodule.${path}.branch" 2>/dev/null)
+      [[ -n "$branch" ]] && git -C "$sub" checkout -q "$branch" 2>/dev/null
+      branch=$(git -C "$sub" symbolic-ref --short -q HEAD)
+    fi
+    [[ -z "$branch" ]] && { conflict+=("$path (detached)"); continue }
+    git -C "$sub" fetch -q upstream 2>/dev/null || { conflict+=("$path (fetch failed)"); continue }
+    if git -C "$sub" merge-base --is-ancestor "upstream/$branch" HEAD 2>/dev/null; then
+      current+=("$path ($branch)"); continue
+    fi
+    if (( dry )); then
+      n=$(git -C "$sub" rev-list --count "HEAD..upstream/$branch" 2>/dev/null)
+      updated+=("$path ($branch +$n)"); continue
+    fi
+    if git -C "$sub" merge --no-edit "upstream/$branch" >/dev/null 2>&1; then
+      if git -C "$sub" push -q origin "$branch" 2>/dev/null; then
+        updated+=("$path ($branch)"); git -C "$root" add -- "$path" 2>/dev/null
+      else
+        conflict+=("$path (merged, push failed)")
+      fi
+    else
+      git -C "$sub" merge --abort 2>/dev/null
+      conflict+=("$path ($branch conflict)")
+    fi
+  done
+
+  (( dry )) && tag=" (dry-run)"
+  print -- "\n=== sync-forks${tag} ==="
+  print -- "updated:     ${${(j:, :)updated}:-(none)}"
+  print -- "up-to-date:  ${${(j:, :)current}:-(none)}"
+  print -- "conflicts:   ${${(j:, :)conflict}:-(none)}"
+  print -- "no upstream: ${${(j:, :)noupstream}:-(none)}"
+  (( ! dry && ${#updated} )) && print -- "\nParent pointers staged -> review, then:\n  git -C \"$root\" commit -m 'Sync forks with upstream'"
+  (( ${#conflict} )) && print -- "\nResolve by hand:\n  git -C \"$root/<submodule>\" merge upstream/<branch>   # fix, commit, push, then git add the pointer"
+}
 
 # Tmux
 alias tmg='tmux new-session -A -s main'
@@ -209,7 +289,7 @@ if is_linux && have pacman; then
 fi
 # Debian/Ubuntu
 if is_linux && have apt; then
-  alias aptUpgrade='sudo apt update && sudo apt upgrade -y'
+  alias aptme='sudo apt update && sudo apt upgrade -y'
 fi
 
 #### FZF #######################################################################
