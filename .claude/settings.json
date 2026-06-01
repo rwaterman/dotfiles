@@ -1,4 +1,5 @@
 {
   "effortLevel": "xhigh",
-  "advisorModel": "opus"
+  "advisorModel": "opus",
+  "model": "opus"
 }

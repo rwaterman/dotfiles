@@ -1,6 +1,6 @@
-# Global Codex Instructions
+# Global Foundation Model/LLM Instructions
 
-Project-level `AGENTS.md` files override these defaults.
+Shared defaults for coding agents. Project-level `AGENTS.md` or `CLAUDE.md` files override these.
 
 ## User Context
 
@@ -10,7 +10,7 @@ Assume a senior technical audience. Be direct, high-signal, and precise. Clarify
 
 ## Environment
 
-macOS Tahoe. Interactive shell: zsh with Oh My Zsh.
+macOS Tahoe. Interactive shell: zsh with Oh-My-Zsh.
 
 - CLI one-liners and copy-paste commands must be zsh-compatible.
 - Bash scripts are fine when run explicitly as scripts.
@@ -27,17 +27,22 @@ macOS Tahoe. Interactive shell: zsh with Oh My Zsh.
 - Preserve user changes in a dirty worktree. Never revert or overwrite work you did not make unless explicitly asked.
 - Use non-interactive git commands. Do not amend commits unless explicitly requested.
 - When blocked by missing context, make a reasonable assumption if low risk; otherwise ask one concise question.
+- Point out overengineering, overinterpretation, or premature convergence.
+
+## Modal Behaviors
+
+- When given a plan: stress-test it, simplify it, and show what breaks.
+- When given writing: tighten it and improve force and clarity. Do not genericize it.
+- When given a people problem: analyze incentives, misunderstandings, and emotional subtext, then propose the response that is both honest and effective.
 
 ## Dotfiles And LLM Files
 
 When working in this dotfiles repo:
 
 - The repo is stowed into `$HOME`; keep paths and filenames suitable for that layout.
-- Keep durable preferences aligned across `AGENTS.md`, `.claude/CLAUDE.md`, and `.copilot/copilot-instructions.md`.
-- Put Codex-specific autonomous execution guidance in `AGENTS.md`.
-- Put Claude-specific commands, skills, and connector notes under `.claude/`.
-- Put editor-completion guidance for GitHub Copilot under `.copilot/`.
-- Do not commit secrets, machine-local tokens, or credentials into dotfiles.
+- `AGENTS.md` is the single source of durable agent preferences. `.claude/CLAUDE.md` and `.copilot/copilot-instructions.md` are symlinks to it, so Claude, Codex, and Copilot read one file — edit `AGENTS.md`, never the symlinks.
+- The IntelliJ Copilot instructions at `.config/github-copilot/intellij/global-copilot-instructions.md` symlink to `.copilot/copilot-instructions.md`, so they resolve to `AGENTS.md` as well.
+- The `.claude/` directory still holds Claude-specific config such as settings, skills, and commands; keep that there.
 
 ## Stack Preferences
 
@@ -45,7 +50,7 @@ When working in this dotfiles repo:
 - Python 3.12+ for scripts, data processing, and Lambda.
 - Prefer ESM imports over CommonJS.
 - Prefer `async`/`await` over raw Promise chains.
-- Use the current project framework and patterns before introducing new tools.
+- Use the current project framework and patterns. Dependencies, patterns, and structure are consistent and don't look bolted together. Assume everything will be maintained and need to keep scaling in scope and features.
 - For IaC, use Terraform or AWS CDK in TypeScript. Prefer Terraform when a package already uses it.
 
 ## Code Style
@@ -53,10 +58,10 @@ When working in this dotfiles repo:
 - Use explicit types in function signatures; infer local variables when clear.
 - Prefer early returns over deep nesting.
 - Fail loudly with context. Avoid bare `catch {}` blocks.
-- Name things precisely. Avoid abbreviations except common ones such as `id`, `ctx`, `req`, and `res`.
+- Never silently fall back to a default environment; require it explicitly or fail loudly. Exception: npm and Python `poe` scripts.
+- Name things precisely. Avoid abbreviations except common ones such as `id`, `ctx`, `req`, and `res`, and `err`
 - Keep functions short and single-purpose.
-- Add concise comments only for non-obvious logic.
-- Do not leave placeholder or TODO implementations unless you clearly flag the limitation.
+- Default to never leaving code comments except in rare cases that they need them or for hacks/workarounds.
 
 ## Testing
 
@@ -70,20 +75,17 @@ When working in this dotfiles repo:
 ## AWS Conventions
 
 - Infer AWS region and account from STS, environment, config, or the active caller. Do not hardcode or prompt unless ambiguous.
-- Use AWS CLI and scripts directly when useful; do not just print instructions for the user to run.
+- Use AWS CLI, GitHub CLI, and other CLI programs/scripts directly and often; do not just print instructions for the user to run.
 - Lambda handlers should be single-purpose, observable, and explicit about failure modes.
-- Use structured logging. Use `middy` middleware when it fits the existing TypeScript Lambda stack.
-- Prefer managed services such as SQS, EventBridge, Step Functions, DynamoDB, and managed schedulers over custom orchestration.
-- For DynamoDB, use single-table design when access patterns are known. Document key schema and access patterns near the implementation.
+- Use structured logging.
+- Prefer managed services such as Lambda, Step Functions, SQS, Aurora RDS, DynamoDB, and managed schedulers over custom orchestration.
 
 ## Response Format
 
 - Prose by default. Use bullets only when the content is naturally list-shaped.
-- Keep headers sparse.
-- Do not use decorative emoji.
-- Use fenced code blocks with language hints.
-- Commit messages, PR titles, Slack messages, and docs should match the surrounding project's convention rather than a personal default voice.
+- Keep headers and paragraphs sparse; keep information specific.
 - Distinguish facts, inferences, and conjectures when the difference affects the decision.
+- Preserve the user's voice: precise, calm, strategic, grounded. Prefer clarity over eloquence.
 
 ## Code Review Mode
 
@@ -131,6 +133,7 @@ For architecture, system design, ADRs, or technology choices:
 For deploys:
 
 - Verify tests, CI, review status, migrations, feature flags, rollback plan, and monitoring before production changes.
+- Prefer local testing and verification before waiting on a deployment.
 - Define rollback triggers before deploy when risk is meaningful.
 - After deploy, verify key flows and watch error rates and latency.
 

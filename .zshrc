@@ -40,21 +40,12 @@ plugins=(
   wd
 )
 
+fpath=("$HOME/.docker/completions" $fpath)
 source "$ZSH/oh-my-zsh.sh"
 
 #### PATH Overrides (OS-aware) ##################################################
-# Coreutils (macOS Homebrew GNU paths)
-if is_macos; then
-  prepend_path "/opt/homebrew/opt/coreutils/libexec/gnubin"
-  # Prefer Homebrew curl (Apple Silicon default)
-  prepend_path "/opt/homebrew/opt/curl/bin"
-  # Intel mac fallback (if present)
-  prepend_path "/usr/local/opt/curl/bin"
-fi
-
 # User bin
 prepend_path "$HOME/bin"
-
 
 #### PROGRAM SETTINGS / OVERRIDES ##############################################
 # ================================================================
@@ -80,7 +71,7 @@ if is_macos; then
     *"M2"*) CPU_FLAG="-O3 -mcpu=apple-m2" ;;
     *"M3"*) CPU_FLAG="-O3 -mcpu=apple-m3" ;;
     *"M4"*) CPU_FLAG="-O3 -mcpu=apple-m4" ;;
-    # *"M5"*) CPU_FLAG="-O3 -mcpu=apple-m5" ;; # TODO: Check back later. No apple-m5 is available yet.
+    *"M5"*) CPU_FLAG="-O3 -mcpu=apple-m4" ;; # TODO: Check back later. No apple-m5 is available yet.
     *)      CPU_FLAG="-O3 -mcpu=native" ;;  # fallback for Intel
   esac
 
@@ -115,7 +106,7 @@ setopt HIST_SAVE_NO_DUPS
 setopt HIST_REDUCE_BLANKS
 
 # Node / TypeScript
-export NODE_OPTIONS="--max-old-space-size=8192 --no-experimental-detect-module --no-experimental-require-module"
+# export NODE_OPTIONS="--max-old-space-size=8192 --no-experimental-detect-module --no-experimental-require-module"
 export JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION=true
 
 # NVM
@@ -125,7 +116,6 @@ prepend_path "$HOME/.pyenv/bin"
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
 have pyenv && eval "$(pyenv init -)"
 have pyenv && eval "$(pyenv init --path)"
-
 #### USER PREFS #################################################################
 
 # Editors
@@ -177,56 +167,56 @@ alias gh_run_watch='gh run watch --compact && ntfy pub $NTFY_TOPIC "Success" || 
 #   sync-forks            fetch upstream -> merge -> push fork -> stage parent pointers
 #   sync-forks --dry-run  preview only; no merge, no push
 # Conflicts are aborted (never left half-applied) and reported for manual sync.
-sync-forks() {
-  emulate -L zsh
-  local root="$HOME/git/github/rwaterman/dotfiles"
-  local dry=0; [[ "$1" == "--dry-run" || "$1" == "-n" ]] && dry=1
-  [[ -d "$root/.git" ]] || { print -u2 "sync-forks: $root not found"; return 1 }
-
-  local path sub branch n tag="" line
-  local -a lines paths updated current conflict noupstream
-  lines=(${(f)"$(git -C "$root" config -f "$root/.gitmodules" --get-regexp '\.path$')"})
-  for line in $lines; do paths+=("${line##* }"); done
-
-  for path in $paths; do
-    sub="$root/$path"
-    git -C "$sub" remote get-url upstream >/dev/null 2>&1 || { noupstream+=("$path"); continue }
-    branch=$(git -C "$sub" symbolic-ref --short -q HEAD)
-    if [[ -z "$branch" ]]; then
-      branch=$(git -C "$root" config -f "$root/.gitmodules" --get "submodule.${path}.branch" 2>/dev/null)
-      [[ -n "$branch" ]] && git -C "$sub" checkout -q "$branch" 2>/dev/null
-      branch=$(git -C "$sub" symbolic-ref --short -q HEAD)
-    fi
-    [[ -z "$branch" ]] && { conflict+=("$path (detached)"); continue }
-    git -C "$sub" fetch -q upstream 2>/dev/null || { conflict+=("$path (fetch failed)"); continue }
-    if git -C "$sub" merge-base --is-ancestor "upstream/$branch" HEAD 2>/dev/null; then
-      current+=("$path ($branch)"); continue
-    fi
-    if (( dry )); then
-      n=$(git -C "$sub" rev-list --count "HEAD..upstream/$branch" 2>/dev/null)
-      updated+=("$path ($branch +$n)"); continue
-    fi
-    if git -C "$sub" merge --no-edit "upstream/$branch" >/dev/null 2>&1; then
-      if git -C "$sub" push -q origin "$branch" 2>/dev/null; then
-        updated+=("$path ($branch)"); git -C "$root" add -- "$path" 2>/dev/null
-      else
-        conflict+=("$path (merged, push failed)")
-      fi
-    else
-      git -C "$sub" merge --abort 2>/dev/null
-      conflict+=("$path ($branch conflict)")
-    fi
-  done
-
-  (( dry )) && tag=" (dry-run)"
-  print -- "\n=== sync-forks${tag} ==="
-  print -- "updated:     ${${(j:, :)updated}:-(none)}"
-  print -- "up-to-date:  ${${(j:, :)current}:-(none)}"
-  print -- "conflicts:   ${${(j:, :)conflict}:-(none)}"
-  print -- "no upstream: ${${(j:, :)noupstream}:-(none)}"
-  (( ! dry && ${#updated} )) && print -- "\nParent pointers staged -> review, then:\n  git -C \"$root\" commit -m 'Sync forks with upstream'"
-  (( ${#conflict} )) && print -- "\nResolve by hand:\n  git -C \"$root/<submodule>\" merge upstream/<branch>   # fix, commit, push, then git add the pointer"
-}
+# sync-forks() {
+#   emulate -L zsh
+#   local root="$HOME/git/github/rwaterman/dotfiles"
+#   local dry=0; [[ "$1" == "--dry-run" || "$1" == "-n" ]] && dry=1
+#   [[ -d "$root/.git" ]] || { print -u2 "sync-forks: $root not found"; return 1 }
+#
+#   local path sub branch n tag="" line
+#   local -a lines paths updated current conflict noupstream
+#   lines=(${(f)"$(git -C "$root" config -f "$root/.gitmodules" --get-regexp '\.path$')"})
+#   for line in $lines; do paths+=("${line##* }"); done
+#
+#   for path in $paths; do
+#     sub="$root/$path"
+#     git -C "$sub" remote get-url upstream >/dev/null 2>&1 || { noupstream+=("$path"); continue }
+#     branch=$(git -C "$sub" symbolic-ref --short -q HEAD)
+#     if [[ -z "$branch" ]]; then
+#       branch=$(git -C "$root" config -f "$root/.gitmodules" --get "submodule.${path}.branch" 2>/dev/null)
+#       [[ -n "$branch" ]] && git -C "$sub" checkout -q "$branch" 2>/dev/null
+#       branch=$(git -C "$sub" symbolic-ref --short -q HEAD)
+#     fi
+#     [[ -z "$branch" ]] && { conflict+=("$path (detached)"); continue }
+#     git -C "$sub" fetch -q upstream 2>/dev/null || { conflict+=("$path (fetch failed)"); continue }
+#     if git -C "$sub" merge-base --is-ancestor "upstream/$branch" HEAD 2>/dev/null; then
+#       current+=("$path ($branch)"); continue
+#     fi
+#     if (( dry )); then
+#       n=$(git -C "$sub" rev-list --count "HEAD..upstream/$branch" 2>/dev/null)
+#       updated+=("$path ($branch +$n)"); continue
+#     fi
+#     if git -C "$sub" merge --no-edit "upstream/$branch" >/dev/null 2>&1; then
+#       if git -C "$sub" push -q origin "$branch" 2>/dev/null; then
+#         updated+=("$path ($branch)"); git -C "$root" add -- "$path" 2>/dev/null
+#       else
+#         conflict+=("$path (merged, push failed)")
+#       fi
+#     else
+#       git -C "$sub" merge --abort 2>/dev/null
+#       conflict+=("$path ($branch conflict)")
+#     fi
+#   done
+#
+#   (( dry )) && tag=" (dry-run)"
+#   print -- "\n=== sync-forks${tag} ==="
+#   print -- "updated:     ${${(j:, :)updated}:-(none)}"
+#   print -- "up-to-date:  ${${(j:, :)current}:-(none)}"
+#   print -- "conflicts:   ${${(j:, :)conflict}:-(none)}"
+#   print -- "no upstream: ${${(j:, :)noupstream}:-(none)}"
+#   (( ! dry && ${#updated} )) && print -- "\nParent pointers staged -> review, then:\n  git -C \"$root\" commit -m 'Sync forks with upstream'"
+#   (( ${#conflict} )) && print -- "\nResolve by hand:\n  git -C \"$root/<submodule>\" merge upstream/<branch>   # fix, commit, push, then git add the pointer"
+# }
 
 # Tmux
 alias tmg='tmux new-session -A -s main'
@@ -246,10 +236,6 @@ alias check_ping="ping google.com -c 10"
 #### Docker completion (path safe) #############################################
 setopt appendhistory
 setopt auto_cd
-fpath=("$HOME/.docker/completions" $fpath)
-autoload -Uz compinit
-compinit
-
 # Docker nuker (careful!)
 alias rm_docker_all='
   docker ps -a -q | xargs -r docker rm -f &&
@@ -313,31 +299,31 @@ calc() {
 
 # SSH login log viewer
 # Usage: ssh_log [days]   (default: 7)
-ssh_log() {
-  local days="${1:-7}"
-  local pattern="Accepted|Failed|Invalid user|Disconnected|Connection closed"
-
-  if is_macos; then
-    log show --predicate 'process == "sshd"' --last "${days}d" --info \
-      | grep -E "$pattern"
-
-  elif is_linux; then
-    # Prefer journald if available, fall back to auth.log
-    if have journalctl; then
-      journalctl -u ssh --since "${days} days ago" \
-        | grep -E "$pattern"
-    elif [ -f /var/log/auth.log ]; then
-      grep -E "$pattern" /var/log/auth.log \
-        | awk -v cutoff="$(date -d "${days} days ago" '+%b %e')" '$0 >= cutoff'
-    else
-      echo "ssh_log: no log source found (tried journald, /var/log/auth.log)" >&2
-      return 1
-    fi
-  else
-    echo "ssh_log: unsupported OS" >&2
-    return 1
-  fi
-}
+# ssh_log() {
+#   local days="${1:-7}"
+#   local pattern="Accepted|Failed|Invalid user|Disconnected|Connection closed"
+#
+#   if is_macos; then
+#     log show --predicate 'process == "sshd"' --last "${days}d" --info \
+#       | grep -E "$pattern"
+#
+#   elif is_linux; then
+#     # Prefer journald if available, fall back to auth.log
+#     if have journalctl; then
+#       journalctl -u ssh --since "${days} days ago" \
+#         | grep -E "$pattern"
+#     elif [ -f /var/log/auth.log ]; then
+#       grep -E "$pattern" /var/log/auth.log \
+#         | awk -v cutoff="$(date -d "${days} days ago" '+%b %e')" '$0 >= cutoff'
+#     else
+#       echo "ssh_log: no log source found (tried journald, /var/log/auth.log)" >&2
+#       return 1
+#     fi
+#   else
+#     echo "ssh_log: unsupported OS" >&2
+#     return 1
+#   fi
+# }
 
 #### Misc Shell Tweaks #########################################################
 stty -ixon
@@ -365,16 +351,10 @@ export PAGER=""
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
 have atuin && eval "$(atuin init zsh --disable-up-arrow)"
 
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=($HOME/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
 
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 
 # Make pastes atomic — disables expansion/completion mid-paste
 autoload -Uz bracketed-paste-magic
@@ -383,3 +363,8 @@ zle -N bracketed-paste bracketed-paste-magic
 # Tell zsh-autosuggestions to clear its suggestion when a paste starts
 # (prevents the "ghost text gets inserted into the paste" interleave)
 ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(bracketed-paste)
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/rick-sroa/.lmstudio/bin"
+# End of LM Studio CLI section
+
