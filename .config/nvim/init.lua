@@ -427,115 +427,60 @@ vim.diagnostic.config({
 })
 
 -- ──────────────────────────────────────────────────────────────────────────────
--- PLUGIN MANAGER (LAZY.NVIM)
+-- PLUGINS (vim.pack built-in package manager)
 -- ──────────────────────────────────────────────────────────────────────────────
 
--- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
-end
-vim.opt.rtp:prepend(lazypath)
+vim.loader.enable()
 
--- ──────────────────────────────────────────────────────────────────────────────
--- PLUGINS
--- ──────────────────────────────────────────────────────────────────────────────
+local gh = function(x) return "https://github.com/" .. x end
 
-local function run_cmd(cmd)
-  if vim.fn.exists(":" .. cmd) == 2 then
-    vim.cmd(cmd)
-  else
-    vim.notify("CodeCompanion command not available: " .. cmd, vim.log.levels.WARN)
-  end
-end
-
-require("lazy").setup({
-  -- Colorscheme
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme("catppuccin")
-    end,
-  },
-
-  -- Treesitter
-  {
-    "nvim-treesitter/nvim-treesitter",
-    branch = "master",
-    lazy = false,
-    build = ":TSUpdate",
-    config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = { "bash", "lua", "go", "python", "java", "javascript", "typescript", "tsx", "terraform", "hcl" },
-        highlight = { enable = true },
-        indent = { enable = true },
-      })
-    end,
-  },
-
-  -- Telescope
-  {
-    "nvim-telescope/telescope.nvim",
-    tag = "0.1.8",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
-      local builtin = require("telescope.builtin")
-      vim.keymap.set("n", "<C-p>", function()
-        builtin.find_files({ hidden = false, no_ignore = false })
-      end, { desc = "Find files" })
-      vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live grep" })
-    end,
-  },
-
-  -- CodeCompanion
-  {
-    "olimorris/codecompanion.nvim",
-    enabled = vim.g.codecompanion_enabled ~= false,
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-    },
-    opts = function()
-      local openai_model = vim.env.CODECOMPANION_OPENAI_MODEL or "gpt-5-codex-5.3"
-      return {
-        opts = { log_level = "DEBUG" },
-        adapters = {
-          openai = function()
-            return require("codecompanion.adapters").extend("openai", {
-              env = { api_key = "OPENAI_API_KEY" },
-              schema = { model = { default = openai_model } },
-            })
-          end,
-        },
-        strategies = {
-          chat = { adapter = "openai" },
-          inline = { adapter = "openai" },
-        },
-      }
-    end,
-    config = function(_, opts)
-      require("codecompanion").setup(opts)
-
-      vim.keymap.set("n", "<leader>cc", function() run_cmd("CodeCompanionChat") end,    { desc = "CodeCompanion chat" })
-      vim.keymap.set("n", "<leader>ca", function() run_cmd("CodeCompanionActions") end, { desc = "CodeCompanion actions" })
-      vim.keymap.set("v", "<leader>ca", function() run_cmd("CodeCompanionActions") end, { desc = "CodeCompanion actions (selection)" })
-      vim.keymap.set("n", "<leader>ci", function() run_cmd("CodeCompanionInline") end,  { desc = "CodeCompanion inline" })
-      vim.keymap.set("v", "<leader>ci", function() run_cmd("CodeCompanionInline") end,  { desc = "CodeCompanion inline (selection)" })
-    end,
-  },
-}, {
-  install = { colorscheme = { "habamax" } },
-  checker = { enabled = true, notify = false },
+vim.pack.add({
+  { src = gh("catppuccin/nvim"),                    name = "catppuccin" },
+  { src = gh("nvim-lua/plenary.nvim") },
+  { src = gh("nvim-telescope/telescope.nvim"),      version = "0.1.8" },
+  { src = gh("olimorris/codecompanion.nvim") },
 })
+
+-- Colorscheme
+vim.cmd.colorscheme("catppuccin")
+
+-- Telescope
+local builtin = require("telescope.builtin")
+vim.keymap.set("n", "<C-p>", function()
+  builtin.find_files({ hidden = false, no_ignore = false })
+end, { desc = "Find files" })
+vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live grep" })
+
+-- CodeCompanion
+if vim.g.codecompanion_enabled ~= false then
+  local openai_model = vim.env.CODECOMPANION_OPENAI_MODEL or "gpt-5-codex-5.3"
+  require("codecompanion").setup({
+    opts = { log_level = "DEBUG" },
+    adapters = {
+      openai = function()
+        return require("codecompanion.adapters").extend("openai", {
+          env = { api_key = "OPENAI_API_KEY" },
+          schema = { model = { default = openai_model } },
+        })
+      end,
+    },
+    strategies = {
+      chat = { adapter = "openai" },
+      inline = { adapter = "openai" },
+    },
+  })
+
+  local function run_cmd(cmd)
+    if vim.fn.exists(":" .. cmd) == 2 then
+      vim.cmd(cmd)
+    else
+      vim.notify("CodeCompanion command not available: " .. cmd, vim.log.levels.WARN)
+    end
+  end
+
+  vim.keymap.set("n", "<leader>cc", function() run_cmd("CodeCompanionChat") end,    { desc = "CodeCompanion chat" })
+  vim.keymap.set("n", "<leader>ca", function() run_cmd("CodeCompanionActions") end, { desc = "CodeCompanion actions" })
+  vim.keymap.set("v", "<leader>ca", function() run_cmd("CodeCompanionActions") end, { desc = "CodeCompanion actions (selection)" })
+  vim.keymap.set("n", "<leader>ci", function() run_cmd("CodeCompanionInline") end,  { desc = "CodeCompanion inline" })
+  vim.keymap.set("v", "<leader>ci", function() run_cmd("CodeCompanionInline") end,  { desc = "CodeCompanion inline (selection)" })
+end
