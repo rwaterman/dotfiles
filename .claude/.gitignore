@@ -13,6 +13,7 @@
 # (e.g. skills/<name>/SKILL.md). Files inside runtime dirs stay ignored because
 # nothing below re-includes them.
 !*/
+/plugins/
 
 # Curated, version-controlled config (anchored to .claude/ root with a leading
 # slash so a stray same-named file in a runtime dir can't be un-ignored).
