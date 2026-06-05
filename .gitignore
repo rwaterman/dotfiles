@@ -16,6 +16,7 @@
 .config/ghostty/shaders
 !.config/ghostty/
 !.claude/
+.claude/plugins/
 
 lazy-lock.json
 

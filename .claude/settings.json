@@ -1,5 +1,49 @@
 {
+  "skillListingBudgetFraction": 0.05,
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "github@claude-plugins-official": false,
+    "claude-md-management@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": false,
+    "atlassian@claude-plugins-official": true,
+    "slack@claude-plugins-official": false,
+    "hookify@claude-plugins-official": false,
+    "greptile@claude-plugins-official": false,
+    "remember@claude-plugins-official": true,
+    "deploy-on-aws@claude-plugins-official": true,
+    "terraform@claude-plugins-official": false,
+    "aws-serverless@claude-plugins-official": true,
+    "pagerduty@claude-plugins-official": false,
+    "aws-core@claude-plugins-official": true,
+    "redis-development@claude-plugins-official": false,
+    "apollo-skills@claude-plugins-official": false,
+    "caveman@caveman": false,
+    "aws-agents@claude-plugins-official": true,
+    "aws-data-analytics@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/juliusbrussee/caveman.git"
+      }
+    }
+  },
   "effortLevel": "xhigh",
+  "theme": "auto",
   "advisorModel": "opus",
-  "model": "opus"
+  "agentPushNotifEnabled": true
 }
