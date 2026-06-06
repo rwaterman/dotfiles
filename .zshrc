@@ -46,6 +46,7 @@ source "$ZSH/oh-my-zsh.sh"
 #### PATH Overrides (OS-aware) ##################################################
 # User bin
 prepend_path "$HOME/bin"
+prepend_path "$HOME/doom-emacs/bin"
 
 #### PROGRAM SETTINGS / OVERRIDES ##############################################
 # ================================================================
@@ -88,11 +89,11 @@ if is_macos && have /usr/libexec/java_home; then
   export JAVA_HOME="$(/usr/libexec/java_home 2>/dev/null)"
 fi
 # On Linux, prefer jenv/packaged Java if present
-if is_linux && [ -z "$JAVA_HOME" ]; then
-  for c in /usr/lib/jvm/default /usr/lib/jvm/java-*/; do
-    [ -d "$c" ] && { export JAVA_HOME="$c"; break; }
-  done
-fi
+# if is_linux && [ -z "$JAVA_HOME" ]; then
+#   for c in /usr/lib/jvm/default /usr/lib/jvm/java-*/; do
+#     [ -d "$c" ] && { export JAVA_HOME="$c"; break; }
+#   done
+# fi
 
 # Shell / History Config
 export HISTSIZE=100000
@@ -167,56 +168,61 @@ alias gh_run_watch='gh run watch --compact && ntfy pub $NTFY_TOPIC "Success" || 
 #   sync-forks            fetch upstream -> merge -> push fork -> stage parent pointers
 #   sync-forks --dry-run  preview only; no merge, no push
 # Conflicts are aborted (never left half-applied) and reported for manual sync.
-# sync-forks() {
-#   emulate -L zsh
-#   local root="$HOME/git/github/rwaterman/dotfiles"
-#   local dry=0; [[ "$1" == "--dry-run" || "$1" == "-n" ]] && dry=1
-#   [[ -d "$root/.git" ]] || { print -u2 "sync-forks: $root not found"; return 1 }
-#
-#   local path sub branch n tag="" line
-#   local -a lines paths updated current conflict noupstream
-#   lines=(${(f)"$(git -C "$root" config -f "$root/.gitmodules" --get-regexp '\.path$')"})
-#   for line in $lines; do paths+=("${line##* }"); done
-#
-#   for path in $paths; do
-#     sub="$root/$path"
-#     git -C "$sub" remote get-url upstream >/dev/null 2>&1 || { noupstream+=("$path"); continue }
-#     branch=$(git -C "$sub" symbolic-ref --short -q HEAD)
-#     if [[ -z "$branch" ]]; then
-#       branch=$(git -C "$root" config -f "$root/.gitmodules" --get "submodule.${path}.branch" 2>/dev/null)
-#       [[ -n "$branch" ]] && git -C "$sub" checkout -q "$branch" 2>/dev/null
-#       branch=$(git -C "$sub" symbolic-ref --short -q HEAD)
-#     fi
-#     [[ -z "$branch" ]] && { conflict+=("$path (detached)"); continue }
-#     git -C "$sub" fetch -q upstream 2>/dev/null || { conflict+=("$path (fetch failed)"); continue }
-#     if git -C "$sub" merge-base --is-ancestor "upstream/$branch" HEAD 2>/dev/null; then
-#       current+=("$path ($branch)"); continue
-#     fi
-#     if (( dry )); then
-#       n=$(git -C "$sub" rev-list --count "HEAD..upstream/$branch" 2>/dev/null)
-#       updated+=("$path ($branch +$n)"); continue
-#     fi
-#     if git -C "$sub" merge --no-edit "upstream/$branch" >/dev/null 2>&1; then
-#       if git -C "$sub" push -q origin "$branch" 2>/dev/null; then
-#         updated+=("$path ($branch)"); git -C "$root" add -- "$path" 2>/dev/null
-#       else
-#         conflict+=("$path (merged, push failed)")
-#       fi
-#     else
-#       git -C "$sub" merge --abort 2>/dev/null
-#       conflict+=("$path ($branch conflict)")
-#     fi
-#   done
-#
-#   (( dry )) && tag=" (dry-run)"
-#   print -- "\n=== sync-forks${tag} ==="
-#   print -- "updated:     ${${(j:, :)updated}:-(none)}"
-#   print -- "up-to-date:  ${${(j:, :)current}:-(none)}"
-#   print -- "conflicts:   ${${(j:, :)conflict}:-(none)}"
-#   print -- "no upstream: ${${(j:, :)noupstream}:-(none)}"
-#   (( ! dry && ${#updated} )) && print -- "\nParent pointers staged -> review, then:\n  git -C \"$root\" commit -m 'Sync forks with upstream'"
-#   (( ${#conflict} )) && print -- "\nResolve by hand:\n  git -C \"$root/<submodule>\" merge upstream/<branch>   # fix, commit, push, then git add the pointer"
-# }
+sync-forks() {
+  emulate -L zsh
+  local root="$HOME/github/rwaterman/dotfiles"
+  local dry=0; [[ "$1" == "--dry-run" || "$1" == "-n" ]] && dry=1
+  [[ -d "$root/.git" ]] || { print -u2 "sync-forks: $root not found"; return 1 }
+
+  local mod sub branch n tag="" line
+  local -a lines mods updated current conflict noupstream
+  lines=(${(f)"$(command git -C "$root" config -f "$root/.gitmodules" --get-regexp '\.path$')"})
+  for line in $lines; do mods+=("${line##* }"); done
+
+  for mod in $mods; do
+    sub="$root/$mod"
+    if [[ ! -e "$sub/.git" ]]; then
+      (( dry )) || command git -C "$root" submodule update --init -- "$mod" >/dev/null 2>&1 \
+        || { conflict+=("$mod (init failed)"); continue }
+      (( dry )) && { noupstream+=("$mod (uninit)"); continue }
+    fi
+    command git -C "$sub" remote get-url upstream >/dev/null 2>&1 || { noupstream+=("$mod"); continue }
+    branch=$(command git -C "$sub" symbolic-ref --short -q HEAD)
+    if [[ -z "$branch" ]]; then
+      branch=$(command git -C "$root" config -f "$root/.gitmodules" --get "submodule.${mod}.branch" 2>/dev/null)
+      [[ -n "$branch" ]] && command git -C "$sub" checkout -q "$branch" 2>/dev/null
+      branch=$(command git -C "$sub" symbolic-ref --short -q HEAD)
+    fi
+    [[ -z "$branch" ]] && { conflict+=("$mod (detached)"); continue }
+    command git -C "$sub" fetch -q upstream 2>/dev/null || { conflict+=("$mod (fetch failed)"); continue }
+    if command git -C "$sub" merge-base --is-ancestor "upstream/$branch" HEAD 2>/dev/null; then
+      current+=("$mod ($branch)"); continue
+    fi
+    if (( dry )); then
+      n=$(command git -C "$sub" rev-list --count "HEAD..upstream/$branch" 2>/dev/null)
+      updated+=("$mod ($branch +$n)"); continue
+    fi
+    if command git -C "$sub" merge --no-edit "upstream/$branch" >/dev/null 2>&1; then
+      if command git -C "$sub" push -q origin "$branch" 2>/dev/null; then
+        updated+=("$mod ($branch)"); command git -C "$root" add -- "$mod" 2>/dev/null
+      else
+        conflict+=("$mod (merged, push failed)")
+      fi
+    else
+      command git -C "$sub" merge --abort 2>/dev/null
+      conflict+=("$mod ($branch conflict)")
+    fi
+  done
+
+  (( dry )) && tag=" (dry-run)"
+  print -- "\n=== sync-forks${tag} ==="
+  print -- "updated:     ${${(j:, :)updated}:-(none)}"
+  print -- "up-to-date:  ${${(j:, :)current}:-(none)}"
+  print -- "conflicts:   ${${(j:, :)conflict}:-(none)}"
+  print -- "no upstream: ${${(j:, :)noupstream}:-(none)}"
+  (( ! dry && ${#updated} )) && print -- "\nParent pointers staged -> review, then:\n  git -C \"$root\" commit -m 'Sync forks with upstream'"
+  (( ${#conflict} )) && print -- "\nResolve by hand:\n  git -C \"$root/<submodule>\" merge upstream/<branch>   # fix, commit, push, then git add the pointer"
+}
 
 # Tmux
 alias tmg='tmux new-session -A -s main'
@@ -344,8 +350,8 @@ fi
 have zoxide && eval "$(zoxide init zsh)"
 
 # Pagers
-export AWS_PAGER=""
-export PAGER=""
+# export AWS_PAGER=""
+# export PAGER=""
 
 # ATUIN (guarded)
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"

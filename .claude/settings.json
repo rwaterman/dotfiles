@@ -43,7 +43,8 @@
     }
   },
   "effortLevel": "xhigh",
-  "theme": "auto",
   "advisorModel": "opus",
-  "agentPushNotifEnabled": true
+  "theme": "auto",
+  "agentPushNotifEnabled": true,
+  "model": "claude-sonnet-4-6"
 }
