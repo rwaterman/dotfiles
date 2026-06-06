@@ -7,13 +7,6 @@
 [submodule ".config/nvim-nvchad"]
 	path = .config/nvim-nvchad
 	url = git@github.com:rwaterman/nvchad-starter.git
-[submodule ".config/emacs-doom"]
-	path = .config/emacs-doom
-	url = git@github.com:rwaterman/doomemacs.git
-	branch = master
-[submodule ".config/emacs-kick"]
-	path = .config/emacs-kick
-	url = git@github.com:rwaterman/emacs-kick.git
 [submodule ".tmux"]
 	path = .tmux
 	url = git@github.com:rwaterman/.tmux.git

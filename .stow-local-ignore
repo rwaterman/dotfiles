@@ -7,11 +7,6 @@ vim
 .idea
 .stowrc
 
-# Framework submodules — folded as single ~/.config directory symlinks
-# (linked outside stow) so each stays a real git checkout and keeps its
-# generated state out of this repo. See README "Emacs".
-emacs-doom
-emacs-kick
 nvim-kick
 nvim-lazyvim
 nvim-nvchad
