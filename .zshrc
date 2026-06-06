@@ -11,7 +11,8 @@ prepend_path() { [ -d "$1" ] && PATH="$1:$PATH"; }
 
 #### ENV - CORE ################################################################
 export LANG='en_US.UTF-8'
-export TERM='xterm-256color'
+[[ -z "$TMUX" ]] && export TERM='xterm-256color'
+export COLORTERM=truecolor
 
 # XDG base
 export XDG_CONFIG_HOME="$HOME/.config"
