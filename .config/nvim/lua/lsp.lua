@@ -1,19 +1,41 @@
-vim.lsp.enable("lua_ls")
-vim.lsp.enable("ts_ls")
-vim.lsp.enable("terraformls")
+require("mason").setup()
 
-vim.api.nvim_create_autocmd("LspAttach", {
-  group = vim.api.nvim_create_augroup("UserLsp", {}),
-  callback = function(ev)
-    local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_completion) then
-      vim.opt.completeopt = { "menu", "menuone", "noinsert", "fuzzy", "popup" }
-      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-      vim.keymap.set("i", "<C-Space>", function()
-        vim.lsp.completion.get()
-      end, { buffer = ev.buf, desc = "Trigger completion" })
+-- Make mason-installed binaries available to vim.lsp
+vim.env.PATH = vim.env.PATH .. ":" .. vim.fn.stdpath("data") .. "/mason/bin"
+
+local registry = require("mason-registry")
+registry.refresh(function()
+  for _, name in ipairs({
+    "lua-language-server",
+    "typescript-language-server",
+    "terraform-ls",
+    "gopls",
+    "pyright",
+    "bash-language-server",
+    "clangd",
+    "efm",
+  }) do
+    local ok, pkg = pcall(registry.get_package, name)
+    if ok and not pkg:is_installed() then
+      pkg:install()
     end
-  end,
+  end
+end)
+
+-- efm needs its config here because lua/efm.lua is the user-editable tools file
+vim.lsp.config("efm", require("efm"))
+
+vim.lsp.enable({
+  "lua_ls",
+  "ts_ls",
+  "terraformls",
+  "gopls",
+  "rust_analyzer",
+  "pyright",
+  "bashls",
+  "clangd",
+  "cl_lsp",
+  "efm",
 })
 
 vim.diagnostic.config({
