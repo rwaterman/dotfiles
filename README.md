@@ -27,37 +27,35 @@ git clone --recurse-submodules <this-repo>
 
 ## Emacs
 
-Uses [Chemacs2](https://github.com/plexus/chemacs2) as a profile switcher. Everything
-editable lives under `.config`:
+Uses [Chemacs2](https://github.com/plexus/chemacs2) as a profile switcher. This repo
+manages the editable config; the frameworks live outside it as plain git clones:
 
 ```
-.config/
-  chemacs/profiles.el   profile definitions (Chemacs2 reads this natively)
-  doom/                 Doom private config (config.el, init.el, packages.el)
-  emacs-doom/           Doom framework      → "default" profile   [submodule]
-  emacs-kick/           emacs-kick          → "kick" profile       [submodule]
-  emacs-personal/       minimal Evil config → "personal" profile
+dotfiles repo:
+  .config/chemacs/profiles.el   profile definitions
+  .config/doom/                 Doom private config (config.el, init.el, packages.el)
+  .config/emacs-personal/       minimal Evil config → "personal" profile
+
+not in repo (clone once per machine):
+  ~/doom-emacs/                 Doom framework      → "default" profile
+  ~/emacs-kick/                 emacs-kick          → "kick" profile
+  ~/.emacs.d/                   Chemacs2 bootloader
 ```
 
-The **Chemacs2 bootloader** is the one piece not in this repo — Emacs loads it from
-`~/.emacs.d`. Bootstrap it once per machine:
+Bootstrap once per machine:
 
 ```sh
 git clone https://github.com/plexus/chemacs2.git ~/.emacs.d
-```
-
-The framework submodules come down with `git clone --recurse-submodules`. After cloning,
-build the Doom profile:
-
-```sh
-~/.config/emacs-doom/bin/doom install
+git clone https://github.com/doomemacs/doomemacs ~/doom-emacs
+git clone https://github.com/LionyxML/emacs-kick ~/emacs-kick
+~/doom-emacs/bin/doom install
 ```
 
 ### Profiles
 
 | Launch | Profile | Notes |
 |--------|---------|-------|
-| `emacs` | default | Doom Emacs (`~/.config/emacs-doom`) |
+| `emacs` | default | Doom Emacs (`~/doom-emacs`) |
 | `emacs --with-profile personal` | personal | Minimal Evil config (this repo) |
-| `emacs --with-profile kick` | kick | [emacs-kick](https://github.com/LionyxML/emacs-kick) |
+| `emacs --with-profile kick` | kick | [emacs-kick](https://github.com/LionyxML/emacs-kick) (`~/emacs-kick`) |
 
