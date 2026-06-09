@@ -1,13 +1,16 @@
 [submodule ".config/nvim-kick"]
 	path = .config/nvim-kick
-	url = git@github.com:rwaterman/kickstart.nvim.git
+	url = https://github.com/nvim-lua/kickstart.nvim.git
+	branch = master
 [submodule ".config/nvim-lazyvim"]
 	path = .config/nvim-lazyvim
-	url = git@github.com:rwaterman/lazyvim-starter.git
+	url = https://github.com/LazyVim/starter.git
+	branch = main
 [submodule ".config/nvim-nvchad"]
 	path = .config/nvim-nvchad
-	url = git@github.com:rwaterman/nvchad-starter.git
+	url = https://github.com/NvChad/starter.git
+	branch = main
 [submodule ".tmux"]
 	path = .tmux
-	url = git@github.com:rwaterman/.tmux.git
+	url = https://github.com/gpakosz/.tmux.git
 	branch = master

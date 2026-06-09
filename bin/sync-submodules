@@ -1,0 +1,30 @@
+#!/bin/sh
+set -eu
+
+resolve_root() {
+  script=$0
+
+  while [ -L "$script" ]; do
+    script_dir=$(CDPATH= cd -P "$(dirname "$script")" && pwd)
+    target=$(readlink "$script")
+
+    case "$target" in
+      /*) script=$target ;;
+      *) script=$script_dir/$target ;;
+    esac
+  done
+
+  script_dir=$(CDPATH= cd -P "$(dirname "$script")" && pwd)
+  CDPATH= cd -P "$script_dir/.." && pwd
+}
+
+root=${DOTFILES_DIR:-$(resolve_root)}
+
+if [ ! -d "$root/.git" ]; then
+  printf '%s\n' "sync-submodules: dotfiles repo not found: $root" >&2
+  exit 1
+fi
+
+git -C "$root" submodule sync --recursive
+git -C "$root" submodule update --init --remote --merge
+git -C "$root" status --short

@@ -18,6 +18,9 @@
 !.claude/
 .claude/plugins/
 
+.agents/
+.remember/
+
 lazy-lock.json
 
 # GitHub Copilot (IntelliJ global instructions symlink)
