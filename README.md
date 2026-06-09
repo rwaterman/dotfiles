@@ -25,37 +25,32 @@ Community profiles are git submodules — they are cloned automatically with:
 git clone --recurse-submodules <this-repo>
 ```
 
+Update tracked submodules from upstream:
+
+```sh
+sync-submodules
+```
+
 ## Emacs
 
-Uses [Chemacs2](https://github.com/plexus/chemacs2) as a profile switcher. This repo
-manages the editable config; the frameworks live outside it as plain git clones:
+Doom uses the current XDG-style split between framework and private config:
 
 ```
 dotfiles repo:
-  .config/chemacs/profiles.el   profile definitions
   .config/doom/                 Doom private config (config.el, init.el, packages.el)
-  .config/emacs-personal/       minimal Evil config → "personal" profile
+  .config/emacs-personal/       optional standalone Evil config
 
-not in repo (clone once per machine):
-  ~/doom-emacs/                 Doom framework      → "default" profile
-  ~/emacs-kick/                 emacs-kick          → "kick" profile
-  ~/.emacs.d/                   Chemacs2 bootloader
+not in repo:
+  ~/.config/emacs/              Doom framework checkout
 ```
 
 Bootstrap once per machine:
 
 ```sh
-git clone https://github.com/plexus/chemacs2.git ~/.emacs.d
-git clone https://github.com/doomemacs/doomemacs ~/doom-emacs
-git clone https://github.com/LionyxML/emacs-kick ~/emacs-kick
-~/doom-emacs/bin/doom install
+git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
+~/.config/emacs/bin/doom install
 ```
 
-### Profiles
-
-| Launch | Profile | Notes |
-|--------|---------|-------|
-| `emacs` | default | Doom Emacs (`~/doom-emacs`) |
-| `emacs --with-profile personal` | personal | Minimal Evil config (this repo) |
-| `emacs --with-profile kick` | kick | [emacs-kick](https://github.com/LionyxML/emacs-kick) (`~/emacs-kick`) |
-
+The Doom framework checkout should stay outside this dotfiles repo. Only
+`.config/doom` is stowed. Avoid keeping both `~/.config/doom` and `~/.doom.d`;
+Doom only recognizes one private config directory.
