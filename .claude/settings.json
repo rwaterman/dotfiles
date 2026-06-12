@@ -1,5 +1,6 @@
 {
   "skillListingBudgetFraction": 0.05,
+  "model": "opus",
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
@@ -45,6 +46,5 @@
   "effortLevel": "xhigh",
   "advisorModel": "opus",
   "theme": "auto",
-  "agentPushNotifEnabled": true,
-  "model": "claude-sonnet-4-6"
+  "agentPushNotifEnabled": true
 }

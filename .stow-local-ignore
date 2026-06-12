@@ -6,6 +6,8 @@ vim
 .DS_Store
 .idea
 .stowrc
+.remember
+.agents
 
 nvim-kick
 nvim-lazyvim
