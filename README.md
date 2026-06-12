@@ -1,12 +1,6 @@
 # dotfiles
 
-## AI Shit
-
-## Claude Skills
-
-.claude/
-
-## NeoVim :sunglasses:
+## NeoVim
 
 `.config/nvim` is the default config (in this repo).
 

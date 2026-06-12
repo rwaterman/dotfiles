@@ -47,7 +47,7 @@ source "$ZSH/oh-my-zsh.sh"
 #### PATH Overrides (OS-aware) ##################################################
 # User bin
 prepend_path "$HOME/bin"
-prepend_path "$HOME/doom-emacs/bin"
+prepend_path "$HOME/.config/emacs/bin"
 
 #### PROGRAM SETTINGS / OVERRIDES ##############################################
 # ================================================================
