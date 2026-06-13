@@ -386,9 +386,6 @@ tmux_conf_urlscan_options="--compact --dedupe"
 # increase history size
 set -g history-limit 100000
 
-# Termix Pro doesn't handle OSC title sequences; prevent content from leaking as visible text
-set -g set-titles off
-
 # start with mouse mode enabled
 set -g mouse on
 
@@ -398,11 +395,11 @@ set -g status-keys vi
 set -g mode-keys vi
 
 # replace C-b by C-a instead of using both prefixes
-set -gu prefix2
-unbind C-a
-unbind C-b
-set -g prefix C-a
-bind C-a send-prefix
+# set -gu prefix2
+# unbind C-a
+# unbind C-b
+# set -g prefix C-a
+# bind C-a send-prefix
 
 # if you don't want Oh my tmux! to alter a binding or a setting, use #!important
 # bind c new-window -c '#{pane_current_path}' #!important

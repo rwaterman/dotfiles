@@ -1,24 +1,10 @@
-# @author Rick Waterman
-# @copyright MIT License
-# .zshrc (OS-aware)
-
-#### Helpers ###################################################################
+# Helpers
 is_macos() { [[ "$OSTYPE" == darwin* ]]; }
 is_linux() { [[ "$OSTYPE" == linux* ]]; }
 have() { command -v "$1" >/dev/null 2>&1; }
 source_if_exists() { [ -f "$1" ] && source "$1"; }
-prepend_path() { [ -d "$1" ] && PATH="$1:$PATH"; }
 
-#### ENV - CORE ################################################################
-export LANG='en_US.UTF-8'
-[[ -z "$TMUX" ]] && export TERM='xterm-256color'
-export COLORTERM=truecolor
-
-# XDG base
-export XDG_CONFIG_HOME="$HOME/.config"
-
-#### OH MY ZSH #################################################################
-export PATH="$HOME/brew/bin:$HOME/.local/bin:$PATH"
+# Oh-My-Zsh
 export ZSH="$HOME/.oh-my-zsh"
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="false"
@@ -41,21 +27,9 @@ plugins=(
   wd
 )
 
-fpath=("$HOME/.docker/completions" $fpath)
 source "$ZSH/oh-my-zsh.sh"
 
-#### PATH Overrides (OS-aware) ##################################################
-# User bin
-prepend_path "$HOME/bin"
-prepend_path "$HOME/.config/emacs/bin"
-
-#### PROGRAM SETTINGS / OVERRIDES ##############################################
-# ================================================================
-# Compiler Optimization Flags (auto-detect Apple Silicon M-series)
-# - macOS: Detect Apple Silicon generation (M1–M5)
-# - Linux: Use -march=native
-# ================================================================
-
+# Program Settings / Overrides
 if is_macos; then
   # Get CPU brand string (e.g. "Apple M3 Max")
   local CHIP_NAME
@@ -85,156 +59,67 @@ elif is_linux; then
   export CXXFLAGS="${CXXFLAGS:--O3 -march=native}"
 fi
 
-# JAVA (macOS java_home helper)
-if is_macos && have /usr/libexec/java_home; then
-  export JAVA_HOME="$(/usr/libexec/java_home 2>/dev/null)"
-fi
-# On Linux, prefer jenv/packaged Java if present
-# if is_linux && [ -z "$JAVA_HOME" ]; then
-#   for c in /usr/lib/jvm/default /usr/lib/jvm/java-*/; do
-#     [ -d "$c" ] && { export JAVA_HOME="$c"; break; }
-#   done
-# fi
+# History
+HISTFILE="$XDG_STATE_HOME/zsh/history"
+HISTSIZE=100000
+SAVEHIST=100000
 
-# Shell / History Config
-export HISTSIZE=100000
-export SAVEHIST=100000
-setopt EXTENDED_HISTORY
-setopt INC_APPEND_HISTORY
+setopt APPEND_HISTORY
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_SAVE_NO_DUPS
-setopt HIST_REDUCE_BLANKS
+setopt HIST_IGNORE_SPACE
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FIND_NO_DUPS
 
-# Node / TypeScript
-# export NODE_OPTIONS="--max-old-space-size=8192 --no-experimental-detect-module --no-experimental-require-module"
-export JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION=true
+# Shell Behavior
+setopt AUTOCD
+setopt NOBEEP
+setopt NUMERIC_GLOB_SORT  # sort file10 after file9, not after file1
 
-# NVM
+# Completion
+autoload -Uz compinit # Load completion system
+autoload -U +X bashcompinit && bashcompinit # Bash completion emulation (for tools that need it)
+compinit -d "$XDG_CACHE_HOME/zsh/zcompdump" # Initialize completion with cached metadata file
+zstyle ':completion:*' menu select # Enable interactive completion menu selection
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # Make completion case-insensitive -- Example: "doc" can complete to "Documents"
 
 # Python / pyenv
-prepend_path "$HOME/.pyenv/bin"
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
 have pyenv && eval "$(pyenv init -)"
 have pyenv && eval "$(pyenv init --path)"
-#### USER PREFS #################################################################
 
-# Editors
-export EDITOR='nvim'
-export VISUAL="$EDITOR"
+# Aliases
+source_if_exists "$HOME/aliases.zsh"
 
-alias vim='nvim'
-alias v='nvim'
-alias e='emacs'
-
-# Neovim profile switcher (NVIM_APPNAME)
-# Each entry maps a short name -> ~/.config/<dir>
-declare -A NVIM_PROFILES
-NVIM_PROFILES=(
-  [personal]="nvim"
-  [lazyvim]="nvim-lazyvim"
-  [nvchad]="nvim-nvchad"
-  [kick]="nvim-kick"
-)
-nvim-personal() { NVIM_APPNAME=nvim nvim "$@"; }
-nvim-lazyvim()  { NVIM_APPNAME=nvim-lazyvim nvim "$@"; }
-nvim-nvchad()   { NVIM_APPNAME=nvim-nvchad nvim "$@"; }
-nvim-kick()     { NVIM_APPNAME=nvim-kick nvim "$@"; }
-
-# Quick config
-alias conf_wez='nvim $HOME/.wezterm.lua'
-alias conf_zsh='nvim $HOME/.zshrc'
-alias conf_nvim='nvim $XDG_CONFIG_HOME/nvim/init.lua'
-
-# Core Utils
-# Safe mkdir default: create parents automatically.
-# `command` ensures the real binary is called, not this alias (prevents recursion).
-alias mkdir='command mkdir -p'
-
-# fzf picker — launches chosen profile with any extra args
-nvims() {
-  local profile dir
-  profile=$(printf '%s\n' "${(@k)NVIM_PROFILES}" | sort | fzf --prompt="nvim profile: " --height=10)
-  [[ -z "$profile" ]] && return
-  dir="${NVIM_PROFILES[$profile]}"
-  NVIM_APPNAME="$dir" nvim "$@"
-}
-
-# Git
-alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
-alias gh_run_watch='gh run watch --compact && ntfy pub $NTFY_TOPIC "Success" || ntfy pub $NTFY_TOPIC "Failed"'
-
-# Tmux
-alias tmg='tmux new-session -A -s main'
-alias tmt='tmux new-session -A -s secondary'
-
-# Terraform
-alias tffv="terraform fmt && terraform validate"
-alias tfplan='terraform plan -out="tfplan"'
-alias tfapply='terraform apply "tfplan"'
-alias tfdeploy='tffv && tfplan && tfapply'
-alias tfdestroy='tffv && terraform plan -destroy -out="tfplan" && tfapply'
-
-# Internet
-alias whatismyip='curl ifconfig.me'
-alias check_ping="ping google.com -c 10"
-
-#### Docker completion (path safe) #############################################
-setopt appendhistory
-setopt auto_cd
-# Docker nuker (careful!)
-alias rm_docker_all='
-  docker ps -a -q | xargs -r docker rm -f &&
-  docker volume ls -q | xargs -r docker volume rm &&
-  docker network ls --format "{{.Name}}" | grep -vE "^(bridge|host|none)$" | xargs -r docker network rm &&
-  docker images -q | xargs -r docker rmi -f
-'
-
-# NPM / Node
-alias npmr='npm run'
-alias npmb='npm run build'
-alias npmbf='npm run build:force'
-alias npml='npm run lint'
-alias npmlf='npm run lint:fix'
-alias npmt='npm run test'
-alias npmw='npm run watch'
-alias npmreset='npm ci && npm run build:force && npm run lint:fix'
-alias npmcipo='npm ci --prefer-offline'
-alias slsol='sls offline -s local'
-alias slssol='sls offline start -s local'
-alias codegen='npm run codegen'
-alias rm_d_ts_files="find . -name '*.d.ts' -not -path './node_modules/*' -delete"
-alias rm_node_modules_dirs="find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
-alias rm_idea_dirs='find . -name ".idea" -type d -prune -print -exec rm -rfv "{}" +'
-
-# Terminal
-alias c="clear"
-
-#### System Admin (OS-aware) ###################################################
-# Homebrew (macOS or Linuxbrew)
-if have brew; then
-  alias brewme='brew update && brew upgrade && brew cleanup'
+# FZF
+# macOS / Homebrew (Apple Silicon)
+if [[ -f $HOME/brew/opt/fzf/shell/key-bindings.zsh ]]; then
+  source $HOME/brew/opt/fzf/shell/key-bindings.zsh
+  source $HOME/brew/opt/fzf/shell/completion.zsh
 fi
+
 # Arch
-if is_linux && have pacman; then
-  alias pacme='sudo pacman -Syu --noconfirm'
-fi
-# Debian/Ubuntu
-if is_linux && have apt; then
-  alias aptme='sudo apt update && sudo apt upgrade -y'
+if [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
+  source /usr/share/fzf/key-bindings.zsh
+  source /usr/share/fzf/completion.zsh
 fi
 
-#### FZF #######################################################################
-source_if_exists "$HOME/.fzf.zsh"
+# Ubuntu
+if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
+  source /usr/share/doc/fzf/examples/key-bindings.zsh
+  source /usr/share/doc/fzf/examples/completion.zsh
+fi
 
-#### Pager highlighting (requires 'highlight') #################################
+source_if_exists "$HOME/fzf.zsh"
+
+# Pagers
+if have bat; then
+  export MANPAGER="bat -l man -p"
+fi
+
 if have highlight; then
   export LESSOPEN="| $(command -v highlight) %s --out-format xterm256 --line-numbers --quiet --force --style zenburn"
   export LESS=" -R"
-  alias less='less -m -N -g -i -J --line-numbers --underline-special'
-  alias more='less'
-  alias cath="highlight \$1 --out-format xterm256 --line-numbers --quiet --force --style zenburn"
 fi
 
 #### Functions #################################################################
@@ -244,34 +129,6 @@ calc() {
   bc -l <<<"scale=10;$calc"
 }
 
-# SSH login log viewer
-# Usage: ssh_log [days]   (default: 7)
-# ssh_log() {
-#   local days="${1:-7}"
-#   local pattern="Accepted|Failed|Invalid user|Disconnected|Connection closed"
-#
-#   if is_macos; then
-#     log show --predicate 'process == "sshd"' --last "${days}d" --info \
-#       | grep -E "$pattern"
-#
-#   elif is_linux; then
-#     # Prefer journald if available, fall back to auth.log
-#     if have journalctl; then
-#       journalctl -u ssh --since "${days} days ago" \
-#         | grep -E "$pattern"
-#     elif [ -f /var/log/auth.log ]; then
-#       grep -E "$pattern" /var/log/auth.log \
-#         | awk -v cutoff="$(date -d "${days} days ago" '+%b %e')" '$0 >= cutoff'
-#     else
-#       echo "ssh_log: no log source found (tried journald, /var/log/auth.log)" >&2
-#       return 1
-#     fi
-#   else
-#     echo "ssh_log: unsupported OS" >&2
-#     return 1
-#   fi
-# }
-
 #### Misc Shell Tweaks #########################################################
 stty -ixon
 setopt extended_glob
@@ -279,38 +136,14 @@ setopt extended_glob
 #### Shell/Prompt tooling (guarded) ############################################
 eval "$(oh-my-posh init zsh)"
 
-# Bash completion emulation (for tools that need it)
-autoload -U +X bashcompinit && bashcompinit
-
-# ngrok completion
-if have ngrok; then
-  eval "$(ngrok completion)"
-fi
-
 # zoxide
 have zoxide && eval "$(zoxide init zsh)"
-
-# Pagers
-# export AWS_PAGER=""
-# export PAGER=""
 
 # ATUIN (guarded)
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
 have atuin && eval "$(atuin init zsh --disable-up-arrow)"
 
-
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Make pastes atomic — disables expansion/completion mid-paste
-autoload -Uz bracketed-paste-magic
-zle -N bracketed-paste bracketed-paste-magic
-
-# Tell zsh-autosuggestions to clear its suggestion when a paste starts
-# (prevents the "ghost text gets inserted into the paste" interleave)
-ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(bracketed-paste)
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/rick-sroa/.lmstudio/bin"
-# End of LM Studio CLI section
