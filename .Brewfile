@@ -1,6 +1,5 @@
 tap "hashicorp/tap"
 brew "actionlint"
-brew "atuin", restart_service: :changed
 brew "awk"
 brew "aws-cdk"
 brew "aws-sam-cli"

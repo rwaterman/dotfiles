@@ -1,15 +1,9 @@
 #### Listing (eza) ############################################################
-# Better ls
-alias ls='eza --icons'
 
-# Detailed listing
-alias ll='eza -lh --icons --git'
-
-# Detailed listing including hidden files
-alias la='eza -lah --icons --git'
-
-# Tree view
-alias tree='eza --tree --icons'
+alias ls='eza --icons --git'
+alias l='eza -lh --icons --git' # Detailed listing
+alias la='eza -lah --icons --git' # Detailed listing including hidden files
+alias t='eza --tree --icons' # Tree view
 
 # Reuse ls completions for eza (avoids defining a separate completion function)
 compdef eza=ls
@@ -17,7 +11,6 @@ compdef eza=ls
 #### Core utilities ###########################################################
 # Better cat
 alias cat='bat'
-
 alias grep='rg --color=auto'
 alias diff='diff --color=auto'
 alias df='df -h'
@@ -28,6 +21,7 @@ alias mkdir='command mkdir -p'
 
 #### Editors ##################################################################
 alias vim='nvim'
+alias nv='nvim'
 
 #### Git ######################################################################
 alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"

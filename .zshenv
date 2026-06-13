@@ -6,6 +6,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
 # Editor
 export EDITOR="nvim"
@@ -14,10 +15,12 @@ export VISUAL="nvim"
 # Display
 export COLORTERM=truecolor
 
-# ---------- GPG ----------
+# GPG
 export GPG_TTY=$(tty)
 
-# ---------- PATH ----------
-# Personal binaries/scripts
-export PATH="$HOME/bin:$HOME/.local/bin:$HOME/brew/bin:$HOME/.pyenv/bin:$PATH"
+# Starship
+export STARSHIP_CONFIG="$ZDOTDIR/starship.toml"
+#
+# PATH
+export PATH="$HOME/brew/bin:$HOME/bin:$HOME/.local/bin:$HOME/.pyenv/bin:$PATH"
 

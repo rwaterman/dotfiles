@@ -1,32 +1,29 @@
-# Helpers
-is_macos() { [[ "$OSTYPE" == darwin* ]]; }
-is_linux() { [[ "$OSTYPE" == linux* ]]; }
-have() { command -v "$1" >/dev/null 2>&1; }
-source_if_exists() { [ -f "$1" ] && source "$1"; }
+# Functions and helpers (sourced first: used throughout this file and other modules)
+source "$ZDOTDIR/functions.zsh"
 
 # Oh-My-Zsh
-export ZSH="$HOME/.oh-my-zsh"
-COMPLETION_WAITING_DOTS="true"
-DISABLE_UNTRACKED_FILES_DIRTY="false"
-ZSH_TMUX_AUTOSTART="false"
-ZSH_TMUX_AUTOCONNECT="false"
-
-plugins=(
-  aws
-  docker
-  docker-compose
-  git
-  node
-  npm
-  ngrok
-  pipenv
-  python
-  terraform
-  tmux
-  wd
-)
-
-source "$ZSH/oh-my-zsh.sh"
+# export ZSH="$HOME/.oh-my-zsh"
+# COMPLETION_WAITING_DOTS="true"
+# DISABLE_UNTRACKED_FILES_DIRTY="false"
+# ZSH_TMUX_AUTOSTART="false"
+# ZSH_TMUX_AUTOCONNECT="false"
+#
+# plugins=(
+#   aws
+#   docker
+#   docker-compose
+#   git
+#   node
+#   npm
+#   ngrok
+#   pipenv
+#   python
+#   terraform
+#   tmux
+#   wd
+# )
+#
+# source "$ZSH/oh-my-zsh.sh"
 
 # Program Settings / Overrides
 if is_macos; then
@@ -87,9 +84,6 @@ export PYTHON_CONFIGURE_OPTS="--enable-shared"
 have pyenv && eval "$(pyenv init -)"
 have pyenv && eval "$(pyenv init --path)"
 
-# Aliases
-source_if_exists "$HOME/aliases.zsh"
-
 # FZF
 # macOS / Homebrew (Apple Silicon)
 if [[ -f $HOME/brew/opt/fzf/shell/key-bindings.zsh ]]; then
@@ -109,11 +103,11 @@ if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
   source /usr/share/doc/fzf/examples/completion.zsh
 fi
 
-source_if_exists "$HOME/fzf.zsh"
-
 # Pagers
-if have bat; then
+if command -v bat >/dev/null 2>&1; then
   export MANPAGER="bat -l man -p"
+elif command -v batcat >/dev/null 2>&1; then
+  export MANPAGER="batcat -l man -p"
 fi
 
 if have highlight; then
@@ -121,26 +115,29 @@ if have highlight; then
   export LESS=" -R"
 fi
 
-#### Functions #################################################################
-calc() {
-  local calc="${*@//p/+}"
-  calc="${calc//x/*}"
-  bc -l <<<"scale=10;$calc"
-}
+# Modular Config Files
+
+# fzf configuration
+source "$ZDOTDIR/fzf.zsh"
+
+# Aliases
+source "$ZDOTDIR/aliases.zsh"
+
+# Custom keybindings
+source "$ZDOTDIR/bindings.zsh"
+
+# Plugins and plugin manager
+source "$ZDOTDIR/plugins.zsh"
+
+# Prompt/theme
+source "$ZDOTDIR/prompt.zsh"
 
 #### Misc Shell Tweaks #########################################################
 stty -ixon
 setopt extended_glob
 
-#### Shell/Prompt tooling (guarded) ############################################
-eval "$(oh-my-posh init zsh)"
-
 # zoxide
 have zoxide && eval "$(zoxide init zsh)"
-
-# ATUIN (guarded)
-[ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
-have atuin && eval "$(atuin init zsh --disable-up-arrow)"
 
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
