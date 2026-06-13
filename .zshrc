@@ -13,7 +13,6 @@ ZSH_TMUX_AUTOCONNECT="false"
 
 plugins=(
   aws
-  common-aliases
   docker
   docker-compose
   git

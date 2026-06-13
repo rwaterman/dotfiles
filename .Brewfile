@@ -15,7 +15,6 @@ brew "cmake"
 brew "cmatrix"
 brew "cmus"
 brew "ctop"
-brew "emacs", restart_service: :changed
 brew "ffmpeg"
 brew "fzf"
 brew "gh"

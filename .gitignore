@@ -8,11 +8,6 @@
 !.config/nvim-lazyvim
 !.config/nvim-nvchad
 !.config/atuin
-!.config/chemacs
-!.config/doom
-!.config/emacs-personal
-!.config/emacs-doom
-!.config/emacs-kick
 .config/ghostty/shaders
 !.config/ghostty/
 !.claude/
@@ -27,10 +22,6 @@ lazy-lock.json
 !.config/github-copilot/
 .config/github-copilot/*
 !.config/github-copilot/intellij/
-
-# Emacs/Doom generated files (Doom private dir is dir-symlinked into the repo)
-.config/doom/custom.el
-.config/doom/.local/
 
 # VS Code Application Support - ignore everything except settings.json
 # Ignore Library/ Application Support/Code, except the actual settings.json
