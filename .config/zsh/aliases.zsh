@@ -1,15 +1,9 @@
 #### Listing (eza) ############################################################
-# Better ls
-alias ls='eza --icons'
 
-# Detailed listing
-alias ll='eza -lh --icons --git'
-
-# Detailed listing including hidden files
-alias la='eza -lah --icons --git'
-
-# Tree view
-alias tree='eza --tree --icons'
+alias ls='eza --icons --git'
+alias l='eza -lh --icons --git' # Detailed listing
+alias la='eza -lah --icons --git' # Detailed listing including hidden files
+alias t='eza --tree --icons' # Tree view
 
 # Reuse ls completions for eza (avoids defining a separate completion function)
 compdef eza=ls
@@ -17,7 +11,6 @@ compdef eza=ls
 #### Core utilities ###########################################################
 # Better cat
 alias cat='bat'
-
 alias grep='rg --color=auto'
 alias diff='diff --color=auto'
 alias df='df -h'
@@ -28,8 +21,51 @@ alias mkdir='command mkdir -p'
 
 #### Editors ##################################################################
 alias vim='nvim'
+alias nv='nvim'
 
 #### Git ######################################################################
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gapa='git add --patch'
+alias gb='git branch'
+alias gba='git branch --all'
+alias gbd='git branch --delete'
+alias gbD='git branch --delete --force'
+alias gc='git commit --verbose'
+alias gcm='git commit --message'
+alias gca='git commit --verbose --all'
+alias gcam='git commit --all --message'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gcp='git cherry-pick'
+alias gcpa='git cherry-pick --abort'
+alias gcpc='git cherry-pick --continue'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gf='git fetch'
+alias gfa='git fetch --all --prune'
+alias gl='git pull'
+alias glg='git log --stat'
+alias glog='git log --oneline --decorate --graph'
+alias gm='git merge'
+alias gma='git merge --abort'
+alias gp='git push'
+alias gpf='git push --force-with-lease'
+alias grb='git rebase'
+alias grba='git rebase --abort'
+alias grbc='git rebase --continue'
+alias grbi='git rebase --interactive'
+alias grh='git reset'
+alias grhh='git reset --hard'
+alias grs='git restore'
+alias grss='git restore --staged'
+alias gst='git status'
+alias gsta='git stash push'
+alias gstp='git stash pop'
+alias gstl='git stash list'
+alias gsw='git switch'
+alias gswc='git switch --create'
 alias git_branch_cleanup="git branch --no-color | fzf -m | xargs -I {} git branch -D '{}'"
 alias gh_run_watch='gh run watch --compact && ntfy pub $NTFY_TOPIC "Success" || ntfy pub $NTFY_TOPIC "Failed"'
 
