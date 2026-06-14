@@ -13,7 +13,7 @@
 theme = Builtin Tango Dark
 
 # Font — each repeated font-family line acts as a fallback
-font-family         = MesloLGLDZ Nerd Font Mono
+font-family         = MesloLGSDZ Nerd Font Mono
 font-family         = SF Mono
 font-family         = Ubuntu Mono
 font-family         = DejaVu Sans Mono

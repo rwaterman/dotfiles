@@ -4,13 +4,11 @@
 # Ignore .config except nvim, ghostty, and github-copilot
 .config/*
 !.config/nvim
-!.config/nvim-kick
-!.config/nvim-lazyvim
-!.config/nvim-nvchad
-!.config/atuin
+!.config/zsh
 .config/ghostty/shaders
 !.config/ghostty/
 !.claude/
+.claude/settings.json
 .claude/plugins/
 
 .agents/
