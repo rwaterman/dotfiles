@@ -2,14 +2,9 @@
 .gitignore
 LICENSE
 README.md
-vim
 .DS_Store
 .idea
 .stowrc
 .remember
 .agents
-
-nvim-kick
-nvim-lazyvim
-nvim-nvchad
-
+.remember

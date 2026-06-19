@@ -4,24 +4,17 @@
 # Ignore .config except nvim, ghostty, and github-copilot
 .config/*
 !.config/nvim
+!.config/emacs
 !.config/zsh
+!.config/ghostty
 .config/ghostty/shaders
-!.config/ghostty/
-!.claude/
+
 .claude/settings.json
 .claude/plugins/
+!.claude/
 
 .agents/
 .remember/
 
-lazy-lock.json
-
 # GitHub Copilot (IntelliJ global instructions symlink)
-!.config/github-copilot/
-.config/github-copilot/*
-!.config/github-copilot/intellij/
-
-# VS Code Application Support - ignore everything except settings.json
-# Ignore Library/ Application Support/Code, except the actual settings.json
-Library/Application Support/Code/
-!Library/Application Support/Code/User/settings.json
+!.config/github-copilot
