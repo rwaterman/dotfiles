@@ -16,7 +16,6 @@ plugins=(
   history-substring-search
   node
   npm
-  ngrok
   pipenv
   python
   terraform
