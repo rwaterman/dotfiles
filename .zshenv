@@ -20,5 +20,5 @@ export COLORTERM=truecolor
 export GPG_TTY=$(tty)
 
 # PATH
-export PATH="$HOME/brew/bin:$HOME/bin:$HOME/.local/bin:$HOME/.pyenv/bin:$PATH"
+export PATH="$HOME/brew/bin:$HOME/brew/sbin:$HOME/bin:$HOME/.local/bin:$HOME/.pyenv/bin:$PATH"
 

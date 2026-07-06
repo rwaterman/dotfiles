@@ -1,5 +1,7 @@
 {
   "skillListingBudgetFraction": 0.05,
+  "model": "opus",
+  "enableWorkflows": true,
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
@@ -26,7 +28,8 @@
     "apollo-skills@claude-plugins-official": false,
     "caveman@caveman": false,
     "aws-agents@claude-plugins-official": true,
-    "aws-data-analytics@claude-plugins-official": true
+    "aws-data-analytics@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
