@@ -18,3 +18,4 @@
 
 # GitHub Copilot (IntelliJ global instructions symlink)
 !.config/github-copilot
+Library/
