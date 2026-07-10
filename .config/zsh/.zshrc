@@ -25,6 +25,29 @@ plugins=(
 
 source "$ZSH/oh-my-zsh.sh"
 
+
+# History
+HISTFILE="$XDG_STATE_HOME/zsh/history"
+HISTSIZE=100000
+SAVEHIST=100000
+
+setopt APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FIND_NO_DUPS
+
+# Shell Behavior
+setopt AUTOCD
+setopt NOBEEP
+setopt NUMERIC_GLOB_SORT  # sort file10 after file9, not after file1
+
+# Completion (OMZ handles compinit; ZSH_COMPDUMP path set in the OMZ block above)
+autoload -U +X bashcompinit && bashcompinit # Bash completion emulation (for tools that need it)
+zstyle ':completion:*' menu select # Enable interactive completion menu selection
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # Make completion case-insensitive -- Example: "doc" can complete to "Documents"
+
 # Program Settings / Overrides
 if is_macos; then
   # Get CPU brand string (e.g. "Apple M3 Max")
@@ -54,28 +77,6 @@ elif is_linux; then
   export CFLAGS="${CFLAGS:--O3 -march=native}"
   export CXXFLAGS="${CXXFLAGS:--O3 -march=native}"
 fi
-
-# History
-HISTFILE="$XDG_STATE_HOME/zsh/history"
-HISTSIZE=100000
-SAVEHIST=100000
-
-setopt APPEND_HISTORY
-setopt SHARE_HISTORY
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_SPACE
-setopt HIST_EXPIRE_DUPS_FIRST
-setopt HIST_FIND_NO_DUPS
-
-# Shell Behavior
-setopt AUTOCD
-setopt NOBEEP
-setopt NUMERIC_GLOB_SORT  # sort file10 after file9, not after file1
-
-# Completion (OMZ handles compinit; ZSH_COMPDUMP path set in the OMZ block above)
-autoload -U +X bashcompinit && bashcompinit # Bash completion emulation (for tools that need it)
-zstyle ':completion:*' menu select # Enable interactive completion menu selection
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # Make completion case-insensitive -- Example: "doc" can complete to "Documents"
 
 # Python / pyenv
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
@@ -108,6 +109,7 @@ elif command -v batcat >/dev/null 2>&1; then
   export MANPAGER="batcat -l man -p"
 fi
 
+# Syntax/Languages
 if have highlight; then
   export LESSOPEN="| $(command -v highlight) %s --out-format xterm256 --line-numbers --quiet --force --style zenburn"
   export LESS=" -R"
@@ -134,13 +136,13 @@ source "$ZDOTDIR/prompt.zsh"
 stty -ixon
 setopt extended_glob
 
+export PATH="$HOME/brew/bin:$PATH"
+
 # zoxide
 have zoxide && eval "$(zoxide init zsh)"
-
-export PATH="/Users/rick/brew/bin:$PATH"
 
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-export HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS=1
+# export HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS=1
