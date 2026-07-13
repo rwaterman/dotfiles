@@ -1,6 +1,6 @@
 {
   "skillListingBudgetFraction": 0.05,
-  "model": "opus[1m]",
+  "model": "claude-fable-5[1m]",
   "enableWorkflows": true,
   "statusLine": {
     "type": "command",
