@@ -61,7 +61,7 @@
     "semgrep@claude-plugins-official": false,
     "azure@claude-plugins-official": false,
     "code-modernization@claude-plugins-official": true,
-    "exa@claude-plugins-official": true,
+    "exa@claude-plugins-official": false,
     "neon@claude-plugins-official": false,
     "migration-to-aws@claude-plugins-official": false,
     "aws-amplify@claude-plugins-official": false,
