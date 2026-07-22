@@ -16,6 +16,7 @@ macOS Tahoe. Interactive shell: zsh with Oh-My-Zsh.
 - Bash scripts are fine when run explicitly as scripts.
 - Do not assume GNU coreutils. Avoid `date -d`, `readlink -f`, `sed -i` without `''`, GNU-only `find`/`xargs`/`grep`/`stat` flags, and Bash 4-only features such as `declare -A` or `mapfile`.
 - Prefer POSIX-compatible commands, BSD-compatible flags, or explicitly note a Homebrew dependency.
+- `curl` is installed via Homebrew (newer than the system `/usr/bin/curl`); modern curl flags are fine.
 - Use `rg` and `rg --files` for search when available.
 
 ## Working Style
@@ -48,7 +49,7 @@ When working in this dotfiles repo:
 - TypeScript on Node.js 24+ for backend services and Lambda handlers.
 - Python 3.12+ for scripts, data processing, and Lambda.
 - Prefer ESM imports over CommonJS.
-- Prefer `async`/`await` over raw Promise chains.
+- Never use `.then()`/`.catch()`/`.finally()` chains. Always `async`/`await` with `try`/`catch`/`finally`. When the enclosing context can't be `async` (React `useEffect`, event handlers, module top level in CJS), define an inner `async` function and invoke it — do not fall back to chaining. Cancellation flags and `AbortController` work the same with `await` inside `try`/`finally`.
 - Use the current project framework and patterns. Dependencies, patterns, and structure are consistent and don't look bolted together. Assume everything will be maintained and need to keep scaling in scope and features.
 - For IaC, use Terraform or AWS CDK in TypeScript. Prefer Terraform when a package already uses it.
 
