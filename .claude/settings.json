@@ -49,9 +49,9 @@
     "playwright@claude-plugins-official": false,
     "ralph-loop@claude-plugins-official": true,
     "desktop-commander@claude-plugins-official": true,
-    "explanatory-output-style@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": false,
     "chrome-devtools-mcp@claude-plugins-official": true,
-    "learning-output-style@claude-plugins-official": true,
+    "learning-output-style@claude-plugins-official": false,
     "gopls-lsp@claude-plugins-official": false,
     "rust-analyzer-lsp@claude-plugins-official": false,
     "php-lsp@claude-plugins-official": false,
@@ -94,5 +94,6 @@
   "effortLevel": "xhigh",
   "advisorModel": "opus",
   "theme": "auto",
+  "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true
 }
