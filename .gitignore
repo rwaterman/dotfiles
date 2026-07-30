@@ -9,7 +9,6 @@
 !.config/ghostty
 .config/ghostty/shaders
 
-.claude/settings.json
 .claude/plugins/
 !.claude/
 

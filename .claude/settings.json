@@ -1,11 +1,8 @@
 {
   "skillListingBudgetFraction": 0.05,
+  "disableClaudeAiConnectors": true,
   "model": "claude-fable-5[1m]",
   "enableWorkflows": true,
-  "statusLine": {
-    "type": "command",
-    "command": "bash \"$(ls -d \"$HOME\"/.claude/plugins/cache/ponytail/ponytail/*/hooks/ponytail-statusline.sh | sort -V | tail -1)\""
-  },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
@@ -30,11 +27,9 @@
     "aws-core@claude-plugins-official": true,
     "redis-development@claude-plugins-official": false,
     "apollo-skills@claude-plugins-official": true,
-    "caveman@caveman": true,
     "aws-agents@claude-plugins-official": true,
     "aws-data-analytics@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": false,
-    "ponytail@ponytail": true,
     "aws-dev-toolkit@claude-plugins-official": true,
     "databases-on-aws@claude-plugins-official": true,
     "sagemaker-ai@claude-plugins-official": true,
@@ -76,18 +71,6 @@
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
-      }
-    },
-    "caveman": {
-      "source": {
-        "source": "git",
-        "url": "https://github.com/juliusbrussee/caveman.git"
-      }
-    },
-    "ponytail": {
-      "source": {
-        "source": "github",
-        "repo": "DietrichGebert/ponytail"
       }
     }
   },
