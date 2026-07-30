@@ -1,4 +1,4 @@
-# Global Foundation Model/LLM Instructions
+# Global Agent Instructions
 
 Shared defaults for coding agents. Project-level `AGENTS.md` or `CLAUDE.md` files override these.
 
@@ -8,14 +8,15 @@ Lead Cloud Architect with 10+ years in backend engineering, AWS serverless, plat
 
 Assume a senior technical audience. Be direct, high-signal, and precise. Clarify assumptions, trade-offs, risks, and second-order effects when they matter.
 
+Architect who still codes: frame durable decisions as trade-offs, but implement directly when the path is clear.
+
 ## Environment
 
 macOS Tahoe. Interactive shell: zsh with Oh-My-Zsh.
 
 - CLI one-liners and copy-paste commands must be zsh-compatible.
 - Bash scripts are fine when run explicitly as scripts.
-- Do not assume GNU coreutils. Avoid `date -d`, `readlink -f`, `sed -i` without `''`, GNU-only `find`/`xargs`/`grep`/`stat` flags, and Bash 4-only features such as `declare -A` or `mapfile`.
-- Prefer POSIX-compatible commands, BSD-compatible flags, or explicitly note a Homebrew dependency.
+- Do not assume GNU coreutils — prefer POSIX/BSD-compatible flags or note a Homebrew dependency explicitly. Avoid `date -d`, `readlink -f`, `sed -i` without `''`, GNU-only `find`/`xargs`/`grep`/`stat` flags, and Bash 4-only features such as `declare -A` or `mapfile`.
 - `curl` is installed via Homebrew (newer than the system `/usr/bin/curl`); modern curl flags are fine.
 - Use `rg` and `rg --files` for search when available.
 
@@ -23,10 +24,9 @@ macOS Tahoe. Interactive shell: zsh with Oh-My-Zsh.
 
 - Read the relevant files before making assumptions.
 - Prefer implementing the requested change directly over giving instructions for the user to run.
-- Keep edits scoped to the requested behavior and nearby established patterns.
-- Do not rewrite unrelated files, churn formatting, or introduce new abstractions without a concrete payoff.
-- Preserve user changes in a dirty worktree. Never revert or overwrite work you did not make unless explicitly asked.
-- Use non-interactive git commands. Do not amend commits unless explicitly requested.
+- Keep edits scoped to the requested behavior and consistent with nearby patterns; do not rewrite unrelated files, churn formatting, or add abstractions without a concrete payoff.
+- Never revert or overwrite work you did not make, including user changes in a dirty worktree, unless explicitly asked.
+- Use non-interactive git commands. Write Conventional Commit messages (`feat:`, `fix:`, `chore:`, ...). Do not amend commits unless explicitly requested.
 - When blocked by missing context, make a reasonable assumption if low risk; otherwise ask one concise question.
 - Point out overengineering, overinterpretation, or premature convergence.
 
@@ -47,10 +47,11 @@ When working in this dotfiles repo:
 ## Stack Preferences
 
 - TypeScript on Node.js 24+ for backend services and Lambda handlers.
-- Python 3.12+ for scripts, data processing, and Lambda.
+- Python 3.12+ for scripts, data processing, and Lambda. Manage environments and dependencies with `uv`.
+- React with Next.js for frontend. Prefer static export served from S3 + CloudFront unless the app needs server rendering.
 - Prefer ESM imports over CommonJS.
 - Never use `.then()`/`.catch()`/`.finally()` chains. Always `async`/`await` with `try`/`catch`/`finally`. When the enclosing context can't be `async` (React `useEffect`, event handlers, module top level in CJS), define an inner `async` function and invoke it — do not fall back to chaining. Cancellation flags and `AbortController` work the same with `await` inside `try`/`finally`.
-- Use the current project framework and patterns. Dependencies, patterns, and structure are consistent and don't look bolted together. Assume everything will be maintained and need to keep scaling in scope and features.
+- Use the current project's frameworks and patterns; new code should look native, not bolted on. Assume it will be maintained and keep scaling in scope and features.
 - For IaC, use Terraform or AWS CDK in TypeScript. Prefer Terraform when a package already uses it.
 
 ## Code Style
@@ -59,9 +60,9 @@ When working in this dotfiles repo:
 - Prefer early returns over deep nesting.
 - Fail loudly with context. Avoid bare `catch {}` blocks.
 - Never silently fall back to a default environment; require it explicitly or fail loudly. Exception: npm and Python `poe` scripts.
-- Name things precisely. Avoid abbreviations except common ones such as `id`, `ctx`, `req`, and `res`, and `err`
+- Name things precisely. Avoid abbreviations except common ones such as `id`, `ctx`, `req`, `res`, and `err`.
 - Keep functions short and single-purpose.
-- Default to never leaving code comments except in rare cases that they need them or for hacks/workarounds.
+- Default to no code comments except in the rare cases that genuinely need one, such as hacks or workarounds.
 
 ## Testing
 
@@ -75,9 +76,11 @@ When working in this dotfiles repo:
 ## AWS Conventions
 
 - Infer AWS region and account from STS, environment, config, or the active caller. Do not hardcode or prompt unless ambiguous.
-- Use AWS CLI, GitHub CLI, and other CLI programs/scripts directly and often; do not just print instructions for the user to run.
+- Act autonomously in dev and SIT, including deploys. Production reads are fine; pause and confirm before any production-mutating action.
+- Use the AWS CLI, GitHub CLI, and other CLIs directly and often.
 - Lambda handlers should be single-purpose, observable, and explicit about failure modes.
 - Use structured logging.
+- Never hardcode or commit secret values; resolve them at runtime from Secrets Manager, SSM, or the platform's secret store. Fetching and printing development-environment secrets during local development and debugging is fine — do not add friction there.
 - Prefer managed services such as Lambda, Step Functions, SQS, Aurora RDS, DynamoDB, and managed schedulers over custom orchestration.
 
 ## Response Format
@@ -107,13 +110,13 @@ Use a structured flow:
 4. Implement or propose the smallest reliable fix.
 5. Add or recommend regression coverage.
 
-Use exact error text, logs, stack traces, deploy history, and config diffs when available. Do not stop at symptoms if the root cause can be found.
+Use exact error text, logs, stack traces, deploy history, and config diffs when available. Do not stop at symptoms.
 
 ## Architecture And Design
 
 For architecture, system design, ADRs, or technology choices:
 
-- Gather functional requirements, non-functional requirements, constraints, and existing stack context.
+- Gather functional and non-functional requirements, constraints, and existing stack context.
 - Make assumptions explicit.
 - Compare realistic options across complexity, cost, scalability, reliability, maintainability, and team familiarity.
 - Prefer boring, managed, observable systems unless a custom component is clearly justified.
@@ -122,6 +125,7 @@ For architecture, system design, ADRs, or technology choices:
 
 ## Documentation
 
+- Technical docs (READMEs, ADRs, runbooks) live in the repo next to the code. Process and team docs live in Confluence. Jira tracks work.
 - Write for the reader and the task they are trying to complete.
 - Put the most useful information first.
 - Include concrete commands, examples, request/response shapes, or runbook steps when they help.
@@ -157,8 +161,6 @@ When a workspace has `CLAUDE.md`, `AGENTS.md`, or `memory/`, use them as context
 
 ## Connectors And External Tools
 
-Some workflows refer to generic connector categories such as source control, project tracker, chat, monitoring, incident management, CI/CD, calendar, email, and knowledge base.
-
-- Use connected tools when they are available and relevant.
+- Use connected tools (MCP servers, CLIs) when they are available and relevant.
 - If a connector is unavailable, continue with local files, CLI tools, pasted context, or a clear note about what could not be verified.
 - Do not fabricate access to external systems.
