@@ -83,6 +83,9 @@ export PYTHON_CONFIGURE_OPTS="--enable-shared"
 have pyenv && eval "$(pyenv init -)"
 have pyenv && eval "$(pyenv init --path)"
 
+# GitHub CLI: expose token for tools that read GITHUB_PERSONAL_ACCESS_TOKEN (e.g. Claude Code's GitHub MCP plugin)
+have gh && export GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)"
+
 # FZF
 # macOS / Homebrew (Apple Silicon)
 if [[ -f $HOME/brew/opt/fzf/shell/key-bindings.zsh ]]; then
