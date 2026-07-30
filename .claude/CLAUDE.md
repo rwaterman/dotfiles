@@ -27,6 +27,7 @@ macOS Tahoe. Interactive shell: zsh with Oh-My-Zsh.
 - Keep edits scoped to the requested behavior and consistent with nearby patterns; do not rewrite unrelated files, churn formatting, or add abstractions without a concrete payoff.
 - Never revert or overwrite work you did not make, including user changes in a dirty worktree, unless explicitly asked.
 - Use non-interactive git commands. Write Conventional Commit messages (`feat:`, `fix:`, `chore:`, ...). Do not amend commits unless explicitly requested.
+- Never lead a command with a blocking `sleep` to wait for remote state (`sleep 60 && check`); agent harnesses block it. Poll with a bounded short-interval loop (`for i in {1..12}; do <check> && break; sleep 10; done`) or run the wait in the background via the harness's mechanism.
 - When blocked by missing context, make a reasonable assumption if low risk; otherwise ask one concise question.
 - Point out overengineering, overinterpretation, or premature convergence.
 
