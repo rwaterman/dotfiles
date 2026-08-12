@@ -1,0 +1,334 @@
+#!/bin/sh
+# Remove all Claude Code / Claude Desktop state, config, credentials and caches.
+#
+# Preserves the version-controlled config in the dotfiles repo (~/.claude is a
+# symlink into it) and refuses to run if it would destroy unsaved git work.
+#
+#   claude-nuke                             dry run (default)
+#   claude-nuke --execute                   wipe, after typed confirmation
+#   claude-nuke --execute --force-worktrees wipe even with unsaved worktree work
+set -eu
+
+DRY=1
+FORCE_WORKTREES=0
+LOG=$HOME/claude-wipe-$(date +%Y%m%d-%H%M%S).log
+
+usage() {
+  cat <<'EOF'
+usage: claude-nuke [--execute] [--force-worktrees]
+
+  (no flags)          dry run: list every target with its size, change nothing
+  --execute           perform the wipe; prompts for a typed WIPE confirmation
+  --force-worktrees   proceed even if a git worktree under a .claude/ directory
+                      has uncommitted changes, unpushed commits, or no upstream
+
+Preserved: git-tracked files in the dotfiles repo's .claude/ directory.
+Not touched: VS Code and JetBrains Claude extensions.
+EOF
+}
+
+for arg in "$@"; do
+  case $arg in
+    --execute) DRY=0 ;;
+    --force-worktrees) FORCE_WORKTREES=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) printf 'claude-nuke: unknown option: %s\n\n' "$arg" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+# --- guard 1: never execute from inside a Claude Code session ---------------
+# The wipe kills the daemon and its children; run from a Claude Code session it
+# would terminate its own parent mid-run, leaving the removal half-finished.
+# Dry runs are harmless, so they stay allowed from anywhere.
+if [ "$DRY" -eq 0 ] && [ -n "${CLAUDECODE:-}${CLAUDE_CODE_SESSION_ID:-}${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
+  printf 'claude-nuke: refusing to run inside a Claude Code session.\n' >&2
+  printf '             Quit Claude Code and re-run from a plain terminal.\n' >&2
+  exit 1
+fi
+
+DOTFILES=${DOTFILES_DIR:-$HOME/git/github/rwaterman/dotfiles}
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/claude-nuke.XXXXXX")
+TARGETS=$TMP/targets
+CLEANS=$TMP/cleans
+: >"$TARGETS"
+: >"$CLEANS"
+trap 'rm -rf "$TMP"' EXIT INT TERM
+
+kb_of() { du -sk "$1" 2>/dev/null | cut -f1 || echo 0; }
+
+# record a path for plain removal
+target() { [ -e "$1" ] || [ -L "$1" ] || return 0; printf '%s\n' "$1" >>"$TARGETS"; }
+
+# record a repo whose .claude/ is cleared via git (repo<TAB>relative-path)
+clean_via_git() { printf '%s\t%s\n' "$1" "$2" >>"$CLEANS"; }
+
+human() {
+  awk -v k="$1" 'BEGIN{
+    if (k >= 1048576) printf "%.1fG", k/1048576;
+    else if (k >= 1024) printf "%.0fM", k/1024;
+    else printf "%dK", k
+  }'
+}
+
+# --- discover project .claude directories ----------------------------------
+# Enumerated at run time, never hardcoded: the set will differ whenever this
+# is actually used.
+PROJECT_CLAUDE=$TMP/project-claude
+find "$HOME/git" -maxdepth 4 -type d -name .claude 2>/dev/null \
+  | grep -v "^$DOTFILES/" >"$PROJECT_CLAUDE" || true
+
+# --- guard 2: refuse to destroy unsaved work in .claude/ worktrees ---------
+UNSAFE=$TMP/unsafe
+CLEAN_WT=$TMP/clean-worktrees
+: >"$UNSAFE"
+: >"$CLEAN_WT"
+
+while IFS= read -r cdir; do
+  [ -n "$cdir" ] || continue
+  parent=$(dirname "$cdir")
+  repo=$(git -C "$parent" rev-parse --show-toplevel 2>/dev/null) || continue
+
+  git -C "$repo" worktree list --porcelain 2>/dev/null \
+    | sed -n 's/^worktree //p' \
+    | while IFS= read -r wt; do
+        case $wt in
+          "$cdir"/*) ;;
+          *) continue ;;
+        esac
+
+        branch=$(git -C "$wt" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')
+        dirty=$(git -C "$wt" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+
+        if ! upstream=$(git -C "$wt" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null); then
+          # No upstream: `git log @{u}..` returns empty and exits non-zero here,
+          # which is indistinguishable from "nothing unpushed". Treat as unsafe.
+          printf '%s\t%s\t%s\tno upstream\n' "$wt" "$branch" "$dirty" >>"$UNSAFE"
+          continue
+        fi
+
+        ahead=$(git -C "$wt" log --oneline "$upstream".. 2>/dev/null | wc -l | tr -d ' ')
+        if [ "$dirty" -gt 0 ] || [ "$ahead" -gt 0 ]; then
+          printf '%s\t%s\t%s\t%s ahead of %s\n' "$wt" "$branch" "$dirty" "$ahead" "$upstream" >>"$UNSAFE"
+        else
+          printf '%s\t%s\n' "$repo" "$wt" >>"$CLEAN_WT"
+        fi
+      done
+done <"$PROJECT_CLAUDE"
+
+if [ -s "$UNSAFE" ] && [ "$FORCE_WORKTREES" -eq 0 ]; then
+  if [ "$DRY" -eq 1 ]; then
+    printf 'WARNING — unsaved work in git worktrees under .claude/\n\n' >&2
+  else
+    printf 'claude-nuke: REFUSING — unsaved work in git worktrees under .claude/\n\n' >&2
+  fi
+  while IFS="$(printf '\t')" read -r wt branch dirty why; do
+    printf '  %s\n    branch %s — %s uncommitted file(s), %s\n' "$wt" "$branch" "$dirty" "$why" >&2
+  done <"$UNSAFE"
+  if [ "$DRY" -eq 0 ]; then
+    printf '\n  Push or stash this work first, or re-run with --force-worktrees.\n' >&2
+    exit 1
+  fi
+  # Dry run: surface the hazard, then carry on so the full plan is reviewable.
+  printf '\n  --execute would refuse until this is pushed, stashed, or forced.\n\n' >&2
+fi
+
+# --- build the target list -------------------------------------------------
+
+# 1. ~/.claude runtime state, keeping the git-tracked config
+[ -d "$DOTFILES/.git" ] && clean_via_git "$DOTFILES" .claude
+target "$HOME/.claude"
+
+# 2. loose config and stray copies
+target "$HOME/.claude.json"
+target "$HOME/.claude.json.backup"
+for f in "$HOME"/.claude.json.tmp.*; do target "$f"; done
+for d in "$HOME"/.claude.bak-*; do target "$d"; done
+target "$HOME/.claude-server-commander"
+target "/tmp/claude-502"
+target "/private/tmp/claude-502"
+
+# 3. project .claude directories
+while IFS= read -r cdir; do
+  [ -n "$cdir" ] || continue
+  parent=$(dirname "$cdir")
+  if repo=$(git -C "$parent" rev-parse --show-toplevel 2>/dev/null); then
+    rel=${cdir#"$repo"/}
+    clean_via_git "$repo" "$rel"
+  else
+    # Not inside a git repo (e.g. the SROADev workspace root) — git clean
+    # cannot reach it, so remove it directly.
+    target "$cdir"
+  fi
+done <"$PROJECT_CLAUDE"
+
+# 4. CLI installs
+target "$HOME/.local/share/claude"
+target "$HOME/.local/state/claude"
+target "$HOME/.local/bin/claude"
+target "$HOME/brew/bin/claude"
+
+# 5. Claude Desktop
+target "/Applications/Claude.app"
+target "$HOME/Library/Application Support/Claude"
+target "$HOME/Library/Application Support/Claude-3p"
+target "$HOME/Library/Caches/com.anthropic.claudefordesktop"
+target "$HOME/Library/Caches/com.anthropic.claudefordesktop.ShipIt"
+target "$HOME/Library/Caches/claude-cli-nodejs"
+target "$HOME/Library/Preferences/com.anthropic.claudefordesktop.plist"
+target "$HOME/Library/HTTPStorages/com.anthropic.claudefordesktop"
+target "$HOME/Library/Logs/Claude"
+
+# --- report ----------------------------------------------------------------
+total=0
+count=0
+
+printf '\n'
+[ "$DRY" -eq 1 ] && printf 'DRY RUN — nothing will be removed.\n\n'
+
+if [ -s "$CLEANS" ]; then
+  printf 'Repo-scoped clean (git-tracked files preserved):\n'
+  while IFS="$(printf '\t')" read -r repo rel; do
+    kb=$(kb_of "$repo/$rel")
+    kept=$(git -C "$repo" ls-files "$rel" 2>/dev/null | wc -l | tr -d ' ')
+    printf '  %8s  %s/%s  (keeping %s tracked file(s))\n' "$(human "$kb")" "$repo" "$rel" "$kept"
+    if [ "$DRY" -eq 1 ] && [ "$kept" -gt 0 ]; then
+      # Curated dirs are whitelisted in .gitignore but hold only .gitkeep stubs:
+      # anything you added and never committed is untracked and will be removed.
+      # Report the file count so an empty dir never looks like real data loss —
+      # a warning that cries wolf is one you learn to ignore.
+      git -C "$repo" clean -nffxd "$rel" 2>/dev/null \
+        | sed -n "s|^Would remove ||p" \
+        | grep -E "^$rel/(agents|commands|skills)/" \
+        | while IFS= read -r cur; do
+            n=$(find "$repo/$cur" -type f 2>/dev/null | wc -l | tr -d ' ')
+            if [ "$n" -eq 0 ]; then
+              printf '      %s (empty)\n' "$cur"
+            else
+              printf '      %s — %s uncommitted file(s) WILL BE LOST\n' "$cur" "$n"
+            fi
+          done
+    fi
+    total=$((total + kb)); count=$((count + 1))
+  done <"$CLEANS"
+  printf '\n'
+fi
+
+if [ -s "$CLEAN_WT" ]; then
+  printf 'Git worktrees to deregister (clean, nothing to lose):\n'
+  while IFS="$(printf '\t')" read -r _repo wt; do
+    printf '  %8s  %s\n' '-' "$wt"
+  done <"$CLEAN_WT"
+  printf '\n'
+fi
+
+if [ -s "$TARGETS" ]; then
+  printf 'Paths to remove:\n'
+  while IFS= read -r p; do
+    kb=$(kb_of "$p")
+    printf '  %8s  %s\n' "$(human "$kb")" "$p"
+    total=$((total + kb)); count=$((count + 1))
+  done <"$TARGETS"
+  printf '\n'
+fi
+
+printf 'Keychain entries to delete:\n'
+printf '  %8s  Claude Code-credentials\n' '-'
+printf '  %8s  Claude Safe Storage (all accounts)\n' '-'
+printf '\nHomebrew cask to uninstall:\n  %8s  claude-code@latest\n' '-'
+
+printf '\nTotal: %s across %s target(s)\n' "$(human "$total")" "$count"
+printf 'Preserved: git-tracked config in %s/.claude\n' "$DOTFILES"
+printf 'Untouched: VS Code and JetBrains Claude extensions\n'
+
+if [ "$DRY" -eq 1 ]; then
+  printf '\nRe-run with --execute to proceed.\n'
+  exit 0
+fi
+
+# --- confirm ---------------------------------------------------------------
+printf '\nThis is irreversible. Type WIPE to confirm: '
+read -r reply
+if [ "$reply" != "WIPE" ]; then
+  printf 'Aborted.\n'
+  exit 1
+fi
+
+exec 3>>"$LOG"
+log() { printf '%s\n' "$*"; printf '%s\n' "$*" >&3; }
+log "claude-nuke $(date '+%Y-%m-%d %H:%M:%S')"
+
+# --- stop running processes ------------------------------------------------
+log 'Stopping Claude processes...'
+pkill -f 'claude daemon' 2>/dev/null || true
+pkill -x claude 2>/dev/null || true
+pkill -x Claude 2>/dev/null || true
+i=0
+while [ "$i" -lt 20 ]; do
+  pgrep -x claude >/dev/null 2>&1 || pgrep -f 'claude daemon' >/dev/null 2>&1 || break
+  i=$((i + 1))
+  sleep 0.5
+done
+pkill -9 -f 'claude daemon' 2>/dev/null || true
+pkill -9 -x claude 2>/dev/null || true
+
+# --- deregister clean worktrees --------------------------------------------
+if [ -s "$CLEAN_WT" ]; then
+  while IFS="$(printf '\t')" read -r repo wt; do
+    log "worktree remove $wt"
+    git -C "$repo" worktree remove --force "$wt" 2>/dev/null || true
+  done <"$CLEAN_WT"
+fi
+
+# --- repo-scoped cleans ----------------------------------------------------
+# -ff (double force) is required: single -f silently skips the ~100 nested git
+# repos under plugins/cache and leaves >1G behind while reporting success.
+if [ -s "$CLEANS" ]; then
+  while IFS="$(printf '\t')" read -r repo rel; do
+    log "git clean -ffxd $repo/$rel"
+    git -C "$repo" clean -ffxd "$rel" >>"$LOG" 2>&1 || true
+    git -C "$repo" worktree prune 2>/dev/null || true
+  done <"$CLEANS"
+fi
+
+# --- plain removals --------------------------------------------------------
+while IFS= read -r p; do
+  log "rm -rf $p"
+  rm -rf "$p"
+done <"$TARGETS"
+
+# --- homebrew --------------------------------------------------------------
+if command -v brew >/dev/null 2>&1; then
+  log 'brew uninstall --cask claude-code@latest'
+  brew uninstall --cask claude-code@latest >>"$LOG" 2>&1 || true
+fi
+
+# --- keychain --------------------------------------------------------------
+# delete-generic-password removes one match per call; Claude Safe Storage holds
+# two accounts (Claude, Claude Key), so loop until it reports nothing left.
+for svc in 'Claude Code-credentials' 'Claude Safe Storage'; do
+  n=0
+  while security delete-generic-password -s "$svc" >/dev/null 2>&1; do
+    n=$((n + 1))
+    [ "$n" -ge 10 ] && break
+  done
+  log "keychain: removed $n entry(ies) for '$svc'"
+done
+
+log ''
+log "Done. Manifest: $LOG"
+
+# The ~/.claude symlink is gone. A fresh install creates a REAL directory there,
+# silently bypassing the dotfiles config — re-stow before first launch.
+cat <<EOF
+
+Your curated config survives at $DOTFILES/.claude, but the ~/.claude symlink
+that wired it up has been removed.
+
+To restore, in this order:
+  1. cd $DOTFILES && stow .
+       recreates ~/.claude -> dotfiles/.claude
+  2. brew install --cask claude-code@latest
+
+Installing first creates a real ~/.claude directory and stow will then refuse
+to link over it, leaving your CLAUDE.md and settings.json unused.
+EOF
