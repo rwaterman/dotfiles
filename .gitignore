@@ -10,8 +10,6 @@
 .config/ghostty/shaders
 
 .claude/plugins/
-# Plugin-managed skill copies (AWS plugins drop them here); not user-authored
-.claude/skills/
 !.claude/
 
 .agents/
