@@ -10,10 +10,14 @@
 # Ignore everything...
 *
 # ...but let git descend into directories so curated nested files are reachable
-# (e.g. skills/<name>/SKILL.md). Files inside runtime dirs stay ignored because
+# (e.g. agents/<name>.md). Files inside runtime dirs stay ignored because
 # nothing below re-includes them.
 !*/
 /plugins/
+# Plugins drop and update skill copies here, so skills/ stays ignored.
+# To version-control a hand-written skill, re-include it narrowly:
+#   !/skills/<name>/**
+/skills/
 
 # Curated, version-controlled config (anchored to .claude/ root with a leading
 # slash so a stray same-named file in a runtime dir can't be un-ignored).
@@ -23,7 +27,6 @@
 !/settings.json
 !/agents/**
 !/commands/**
-!/skills/**
 
 # Explicitly machine-local (kept ignored even if a rule above ever loosens):
 #   settings.local.json  - per-machine permission overrides (Claude Code convention)
