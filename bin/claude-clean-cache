@@ -1,0 +1,148 @@
+#!/bin/sh
+# Reclaim disk space from Claude Code / Claude Desktop caches.
+#
+# Removes only regenerable data. Your history, memories, session transcripts,
+# plans, settings, login and keychain entries are left alone.
+#
+#   claude-clean-cache                 dry run (default)
+#   claude-clean-cache --execute       delete the caches
+#   claude-clean-cache --execute --include-vm   also drop the ~10G VM bundles
+set -eu
+
+DRY=1
+INCLUDE_VM=0
+FORCE=0
+
+usage() {
+  cat <<'EOF'
+usage: claude-clean-cache [--execute] [--include-vm] [--force]
+
+  (no flags)     dry run: list every cache with its size, change nothing
+  --execute      delete the caches
+  --include-vm   also remove Claude Desktop VM bundles (~10G, re-downloaded
+                 on next use — slow to refetch, so it is opt-in)
+  --force        proceed even while Claude is running
+
+Kept: history.jsonl, projects/ (memories and transcripts), sessions/, plans/,
+      tasks/, backups/, telemetry/, file-history/, settings, cookies and
+      local storage (stays logged in), keychain credentials.
+EOF
+}
+
+for arg in "$@"; do
+  case $arg in
+    --execute) DRY=0 ;;
+    --include-vm) INCLUDE_VM=1 ;;
+    --force) FORCE=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) printf 'claude-clean-cache: unknown option: %s\n\n' "$arg" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/claude-clean.XXXXXX")
+TARGETS=$TMP/targets
+: >"$TARGETS"
+trap 'rm -rf "$TMP"' EXIT INT TERM
+
+kb_of() { du -sk "$1" 2>/dev/null | cut -f1 || echo 0; }
+target() { [ -e "$1" ] || return 0; printf '%s\n' "$1" >>"$TARGETS"; }
+
+human() {
+  awk -v k="$1" 'BEGIN{
+    if (k >= 1048576) printf "%.1fG", k/1048576;
+    else if (k >= 1024) printf "%.0fM", k/1024;
+    else printf "%dK", k
+  }'
+}
+
+# --- running-instance check ------------------------------------------------
+# Clearing plugins/cache under a live session breaks plugin resolution for that
+# session. Warn rather than hard-fail: the risk is a broken session, not lost data.
+if [ "$DRY" -eq 0 ] && [ "$FORCE" -eq 0 ]; then
+  if pgrep -x claude >/dev/null 2>&1 || pgrep -x Claude >/dev/null 2>&1; then
+    printf 'claude-clean-cache: Claude is running.\n' >&2
+    printf '  Clearing the plugin cache under a live session can break it.\n' >&2
+    printf '  Quit Claude first, or re-run with --force.\n' >&2
+    exit 1
+  fi
+fi
+
+CLAUDE_HOME=$HOME/.claude
+DESKTOP="$HOME/Library/Application Support/Claude"
+
+# --- Claude Code caches ----------------------------------------------------
+target "$CLAUDE_HOME/plugins/cache"          # cloned plugin repos, re-fetched on demand
+target "$CLAUDE_HOME/cache"
+target "$CLAUDE_HOME/paste-cache"
+target "$CLAUDE_HOME/shell-snapshots"
+target "$CLAUDE_HOME/session-env"            # stale per-session env dirs
+target "$CLAUDE_HOME/security/agent-sdk-venv" # regenerable Python venv
+target "$CLAUDE_HOME/gh-pr-status-cache.json"
+target "$CLAUDE_HOME/mcp-needs-auth-cache.json"
+target "$CLAUDE_HOME/plugins/plugin-catalog-cache.json"
+target "$CLAUDE_HOME/stats-cache.json"
+target "$HOME/Library/Caches/claude-cli-nodejs"
+target "/tmp/claude-502"
+target "/private/tmp/claude-502"
+
+# --- Claude Desktop caches -------------------------------------------------
+# Deliberately excluded: Cookies, Local Storage, IndexedDB, Session Storage and
+# Partitions hold the login session — removing them signs you out.
+target "$DESKTOP/Cache"
+target "$DESKTOP/Code Cache"
+target "$DESKTOP/GPUCache"
+target "$DESKTOP/DawnGraphiteCache"
+target "$DESKTOP/DawnWebGPUCache"
+target "$DESKTOP/fcache"
+target "$DESKTOP/blob_storage"
+target "$DESKTOP/Shared Dictionary"
+target "$DESKTOP/shared_proto_db"
+target "$DESKTOP/sentry"
+target "$DESKTOP/Crashpad"
+target "$HOME/Library/Caches/com.anthropic.claudefordesktop"
+target "$HOME/Library/Caches/com.anthropic.claudefordesktop.ShipIt"
+
+# --- opt-in: VM bundles ----------------------------------------------------
+if [ "$INCLUDE_VM" -eq 1 ]; then
+  target "$DESKTOP/vm_bundles"
+  target "$DESKTOP/claude-code-vm"
+fi
+
+# --- report ----------------------------------------------------------------
+total=0
+count=0
+
+printf '\n'
+[ "$DRY" -eq 1 ] && printf 'DRY RUN — nothing will be removed.\n\n'
+printf 'Caches to clear:\n'
+
+while IFS= read -r p; do
+  kb=$(kb_of "$p")
+  printf '  %8s  %s\n' "$(human "$kb")" "$p"
+  total=$((total + kb)); count=$((count + 1))
+done <"$TARGETS"
+
+printf '\nTotal: %s across %s cache(s)\n' "$(human "$total")" "$count"
+
+if [ "$INCLUDE_VM" -eq 0 ]; then
+  vm=$(kb_of "$DESKTOP/vm_bundles")
+  vmc=$(kb_of "$DESKTOP/claude-code-vm")
+  sum=$((vm + vmc))
+  [ "$sum" -gt 0 ] && printf 'Skipped: %s of VM bundles (add --include-vm to clear)\n' "$(human "$sum")"
+fi
+
+printf 'Kept: history, memories, transcripts, plans, settings, login, keychain\n'
+
+if [ "$DRY" -eq 1 ]; then
+  printf '\nRe-run with --execute to clear.\n'
+  exit 0
+fi
+
+# --- remove ----------------------------------------------------------------
+printf '\n'
+while IFS= read -r p; do
+  printf 'removing %s\n' "$p"
+  rm -rf "$p"
+done <"$TARGETS"
+
+printf '\nReclaimed %s. Caches rebuild automatically on next use.\n' "$(human "$total")"
