@@ -33,6 +33,7 @@ brew "ossp-uuid"
 brew "poetry"
 brew "postgresql", restart_service: :changed, link: true
 brew "postgresql@16",
+brew "pre-commit"
 brew "pyenv"
 brew "reattach-to-user-namespace"
 brew "ripgrep"
