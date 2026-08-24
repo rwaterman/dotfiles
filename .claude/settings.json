@@ -93,5 +93,38 @@
   "advisorModel": "opus",
   "theme": "auto",
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "autoMode": {
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: AWS (inferred from ~/.claude/CLAUDE.md AWS Conventions and use of aws CLI in this project; no repo-specific evidence)",
+      "**Repository visibility**: assume private unless the remote host and repo name indicate otherwise, or a visibility check in the transcript shows public — this repo has no remotes and is not queryable via gh, so visibility could not be verified",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: AWS Secrets Manager / SSM (per ~/.claude/CLAUDE.md AWS Conventions — never hardcode or commit secret values)",
+      "**Default / protected branches**: not queryable here (no remotes configured on this repo; gh lookup unavailable)",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Source control**: The trusted repo (this checkout at /Users/rick/git/github/rwaterman) — no remotes are configured, so there is no remote source-control target beyond the local working tree",
+      "**Trusted internal domains**: blog.rickwaterman.com, rickwaterman.com, blog-dev.rickwaterman.com, notes.rickwaterman.com",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar; note ecs-alb-autoscaling-iac/terraform/envs/prod.tfvars and scripts/aws/secretsmanager/create_secrets_manager_secret.sh as sensitive-looking paths found in this repo",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment (e.g. matches `prod-db`, not `producer`) — this repo's ecs-alb-autoscaling-iac/terraform/envs/prod.tfvars and its deploy/destroy-terraform.sh scripts fall under this heuristic",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment — applies to ecs-alb-autoscaling-iac/terraform/ and its prod.tfvars",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development (cloud/backend architecture, AWS serverless, IaC, personal site infrastructure)",
+      "**Trusted repo**: The git repository the agent started in (/Users/rick/git/github/rwaterman) — no remotes are configured, so there is no corroborated remote to extend trust to; visibility is unverified",
+      "**Org-specific CLIs**: None configured",
+      "**routine under this repo's prefix**: aws, dig, and npx were used routinely in this project's transcripts and are treated as expected tooling here"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "Bash(aws:* apply) against ecs-alb-autoscaling-iac/terraform/envs/prod.tfvars or via ecs-alb-autoscaling-iac/scripts/deploy-terraform.sh — production Terraform apply",
+      "Bash(*) ecs-alb-autoscaling-iac/scripts/destroy-terraform.sh — Terraform destroy is a destructive subcommand against IaC-managed infrastructure"
+    ]
+  }
 }
