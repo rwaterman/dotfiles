@@ -1,6 +1,5 @@
 {
   "skillListingBudgetFraction": 0.05,
-  "model": "claude-fable-5[1m]",
   "disableClaudeAiConnectors": true,
   "enableWorkflows": true,
   "enabledPlugins": {

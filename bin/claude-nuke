@@ -155,7 +155,7 @@ while IFS= read -r cdir; do
     rel=${cdir#"$repo"/}
     clean_via_git "$repo" "$rel"
   else
-    # Not inside a git repo (e.g. the SROADev workspace root) — git clean
+    # Not inside a git repo (e.g. a non-repo workspace root) — git clean
     # cannot reach it, so remove it directly.
     target "$cdir"
   fi

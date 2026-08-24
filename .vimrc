@@ -1,4 +1,4 @@
-" @author Rick Waterman richardwaterman@gmail.com
+" @author Rick Waterman
 " @license MIT
 
 set mouse+=a                 " Enable the mouse and enable tmux hack
