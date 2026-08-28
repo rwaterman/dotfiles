@@ -38,7 +38,8 @@ Enterprise state is read from organization.enterpriseOwners:
 
   owners visible   enterprise answering normally
   none visible     org is not in an enterprise, or the token lacks
-                   read:enterprise (add it with: gh auth refresh -s read:enterprise)
+                   read:enterprise — without that scope these are
+                   indistinguishable, so the report says which applies
   refused          GraphQL reports the enterprise suspended
 
 Exit codes: 0 healthy, 1 degraded or suspended, 2 usage error, 3 gh unusable.
@@ -56,7 +57,7 @@ classify_enterprise() {
       '' | *[!0-9]*)
         printf 'unknown\tunreadable owner count: %s\n' "$_text" ;;
       0)
-        printf 'none\tno enterprise owners visible (not in an enterprise, or token lacks read:enterprise)\n' ;;
+        printf 'none\tno enterprise owners visible\n' ;;
       *)
         printf 'ok\t%s enterprise owner(s) visible\n' "$_text" ;;
     esac
@@ -140,7 +141,7 @@ else
   printf '  membership    none — you are not a member of %s\n' "$org"
 fi
 
-plan=$(gh api "/orgs/$org" --jq '.plan.name // empty' 2>/dev/null || true)
+plan=$(printf '%s' "$org_json" | sed -n 's/.*"plan":{"name":"\([^"]*\)".*/\1/p')
 if [ -n "$plan" ]; then
   printf '  plan          %s\n' "$plan"
   if [ "$plan" = "free" ]; then
@@ -167,7 +168,16 @@ detail=$(printf '%s' "$verdict" | cut -f2)
 printf '\n'
 case $state in
   ok)        printf '  enterprise    OK — %s\n' "$detail" ;;
-  none)      printf '  enterprise    n/a — %s\n' "$detail" ;;
+  none)
+    printf '  enterprise    n/a — %s\n' "$detail"
+    if gh auth status 2>&1 | grep -q 'read:enterprise'; then
+      printf '                (token has read:enterprise, so %s is not in an\n' "$org"
+      printf '                 enterprise this account can see)\n'
+    else
+      printf '                (token lacks read:enterprise, which cannot tell a healthy\n'
+      printf '                 enterprise from none — gh auth refresh -h github.com -s read:enterprise)\n'
+    fi
+    ;;
   suspended) printf '  enterprise    SUSPENDED — %s\n' "$detail"; degraded=1 ;;
   *)         printf '  enterprise    UNKNOWN — %s\n' "$detail"; degraded=1 ;;
 esac
