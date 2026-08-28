@@ -1,0 +1,189 @@
+#!/bin/sh
+# Report the health of a GitHub organisation and of the enterprise above it.
+#
+# The two layers fail independently. A suspended enterprise is invisible to
+# REST: its organisations still answer 200, membership still reads "active",
+# and only an enterprise-scoped GraphQL field reveals the suspension. Checking
+# the org alone reports a healthy org while the graph is dark.
+#
+#   gh-org-health ACME          check the ACME organisation
+#   gh-org-health --self-test   verify the classifier, no network
+set -eu
+
+# gh pages its output when stdout is a terminal. Every call below is either
+# scraped or printed as part of a report, so the pager is always wrong here.
+GH_PAGER='cat'
+export GH_PAGER
+
+SUSPENDED_MARKER='This schema is unavailable for suspended enterprises'
+
+usage() {
+  cat <<'EOF'
+usage: gh-org-health <org>
+       gh-org-health --self-test
+
+  <org>          organisation login to check, e.g. acme-corp
+  --self-test    check the classifier against canned responses, no network
+
+Checks two layers, because they fail independently:
+
+  organisation   does /orgs/<org> resolve, and is your membership active
+  enterprise     does the enterprise GraphQL schema still answer, or is the
+                 enterprise above the org suspended
+
+A suspended enterprise leaves REST entirely healthy, so an org-only check
+reports OK while every enterprise-scoped GraphQL query is refused.
+
+Enterprise state is read from organization.enterpriseOwners:
+
+  owners visible   enterprise answering normally
+  none visible     org is not in an enterprise, or the token lacks
+                   read:enterprise (add it with: gh auth refresh -s read:enterprise)
+  refused          GraphQL reports the enterprise suspended
+
+Exit codes: 0 healthy, 1 degraded or suspended, 2 usage error, 3 gh unusable.
+EOF
+}
+
+# classify_enterprise <exit-status> <response-text>
+# Prints "<state>\t<detail>". Pure: no network, so --self-test can drive it.
+classify_enterprise() {
+  _status=$1
+  _text=$2
+
+  if [ "$_status" -eq 0 ]; then
+    case $_text in
+      '' | *[!0-9]*)
+        printf 'unknown\tunreadable owner count: %s\n' "$_text" ;;
+      0)
+        printf 'none\tno enterprise owners visible (not in an enterprise, or token lacks read:enterprise)\n' ;;
+      *)
+        printf 'ok\t%s enterprise owner(s) visible\n' "$_text" ;;
+    esac
+    return
+  fi
+
+  case $_text in
+    *"$SUSPENDED_MARKER"*)
+      printf 'suspended\tGraphQL refuses the enterprise schema\n' ;;
+    *)
+      printf 'unknown\t%s\n' "$(printf '%s' "$_text" | tr '\n' ' ')" ;;
+  esac
+}
+
+self_test() {
+  _failed=0
+
+  check() {
+    _got=$(classify_enterprise "$2" "$3" | cut -f1)
+    if [ "$_got" = "$4" ]; then
+      printf 'ok    %s\n' "$1"
+    else
+      printf 'FAIL  %s: want %s, got %s\n' "$1" "$4" "$_got" >&2
+      _failed=1
+    fi
+  }
+
+  check 'owners visible'  0 '3'                                      ok
+  check 'no owners'       0 '0'                                      none
+  check 'suspended'       1 "gh: $SUSPENDED_MARKER."                 suspended
+  check 'other error'     1 'gh: Could not resolve to an Organization' unknown
+  check 'garbage on 0'    0 'null'                                   unknown
+
+  [ "$_failed" -eq 0 ] || exit 1
+  printf '\nclassifier ok\n'
+}
+
+case ${1-} in
+  -h | --help) usage; exit 0 ;;
+  --self-test) self_test; exit 0 ;;
+  '') printf 'gh-org-health: an organisation is required\n\n' >&2; usage >&2; exit 2 ;;
+  -*) printf 'gh-org-health: unknown option: %s\n\n' "$1" >&2; usage >&2; exit 2 ;;
+esac
+
+org=$1
+[ $# -eq 1 ] || { printf 'gh-org-health: unexpected argument: %s\n\n' "$2" >&2; usage >&2; exit 2; }
+
+command -v gh >/dev/null 2>&1 || {
+  printf 'gh-org-health: gh is not installed (brew install gh)\n' >&2
+  exit 3
+}
+gh auth status >/dev/null 2>&1 || {
+  printf 'gh-org-health: gh is not authenticated (gh auth login)\n' >&2
+  exit 3
+}
+
+degraded=0
+
+printf 'organisation: %s\n\n' "$org"
+
+# --- layer 1: the organisation ---------------------------------------------
+# gh writes the response body to stdout and its own diagnostics to stderr, so
+# keep them apart: the body carries the real reason, stderr adds scope hints.
+if org_json=$(gh api "/orgs/$org" 2>/dev/null); then
+  printf '  org           reachable\n'
+else
+  message=$(printf '%s' "$org_json" | sed -n 's/.*"message":"\([^"]*\)".*/\1/p')
+  status=$(printf '%s' "$org_json" | sed -n 's/.*"status":"\([^"]*\)".*/\1/p')
+  printf '  org           UNREACHABLE — %s (HTTP %s)\n' "${message:-unknown error}" "${status:-?}"
+  printf '\nA missing org means it does not exist, was renamed or deleted, or your\ntoken cannot see it. Enterprise suspension does NOT cause this.\n'
+  exit 1
+fi
+
+if membership=$(gh api "/user/memberships/orgs/$org" --jq '.state + " (" + .role + ")"' 2>&1); then
+  printf '  membership    %s\n' "$membership"
+  case $membership in
+    active*) : ;;
+    *) degraded=1 ;;
+  esac
+else
+  printf '  membership    none — you are not a member of %s\n' "$org"
+fi
+
+plan=$(gh api "/orgs/$org" --jq '.plan.name // empty' 2>/dev/null || true)
+if [ -n "$plan" ]; then
+  printf '  plan          %s\n' "$plan"
+  if [ "$plan" = "free" ]; then
+    printf '                (an enterprise org reporting "free" has lost its\n'
+    printf '                 plan features — Dependabot, rulesets, scanning)\n'
+  fi
+else
+  printf '  plan          hidden (needs org admin)\n'
+fi
+
+# --- layer 2: the enterprise above it --------------------------------------
+query="{organization(login:\"$org\"){enterpriseOwners(first:1){nodes{login}}}}"
+if probe=$(gh api graphql -f query="$query" \
+             --jq '.data.organization.enterpriseOwners.nodes | length' 2>&1); then
+  probe_status=0
+else
+  probe_status=1
+fi
+
+verdict=$(classify_enterprise "$probe_status" "$probe")
+state=$(printf '%s' "$verdict" | cut -f1)
+detail=$(printf '%s' "$verdict" | cut -f2)
+
+printf '\n'
+case $state in
+  ok)        printf '  enterprise    OK — %s\n' "$detail" ;;
+  none)      printf '  enterprise    n/a — %s\n' "$detail" ;;
+  suspended) printf '  enterprise    SUSPENDED — %s\n' "$detail"; degraded=1 ;;
+  *)         printf '  enterprise    UNKNOWN — %s\n' "$detail"; degraded=1 ;;
+esac
+
+printf '\n'
+if [ "$degraded" -eq 0 ]; then
+  printf '%s: healthy\n' "$org"
+  exit 0
+fi
+
+if [ "$state" = suspended ]; then
+  cat <<'EOF'
+Every enterprise-scoped GraphQL query will be refused until the enterprise is
+reinstated. REST keeps working, so features that quietly depend on the
+enterprise plan (Dependabot, rulesets, secret scanning) may be off rather than
+broken — re-check them after reinstatement instead of debugging them as config.
+EOF
+fi
+exit 1
