@@ -143,6 +143,7 @@ For architecture, system design, ADRs, or technology choices:
 - Technical docs (READMEs, ADRs, runbooks) live in the repo next to the code. Process and team docs live in Confluence. Jira tracks work.
 - Write for the reader and the task they are trying to complete.
 - Put the most useful information first.
+- Add a table of contents near the top of any doc with more than one section: the native `toc` macro on Confluence pages, a linked heading list in repo markdown.
 - Include concrete commands, examples, request/response shapes, or runbook steps when they help.
 - Link to existing docs instead of duplicating large sections.
 - Keep docs current with the code being changed.
