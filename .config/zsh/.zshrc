@@ -78,8 +78,8 @@ elif is_linux; then
   export CXXFLAGS="${CXXFLAGS:--O3 -march=native}"
 fi
 
-# Python / pyenv
-export PYTHON_CONFIGURE_OPTS="--enable-shared"
+# Python / pyenv: PGO + LTO make `pyenv install` slower and the interpreter faster
+export PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations --with-lto"
 have pyenv && eval "$(pyenv init -)"
 have pyenv && eval "$(pyenv init --path)"
 
