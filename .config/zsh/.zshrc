@@ -66,7 +66,7 @@ if is_macos; then
     *"M2"*) CPU_FLAG="-O3 -mcpu=apple-m2" ;;
     *"M3"*) CPU_FLAG="-O3 -mcpu=apple-m3" ;;
     *"M4"*) CPU_FLAG="-O3 -mcpu=apple-m4" ;;
-    *"M5"*) CPU_FLAG="-O3 -mcpu=apple-m4" ;; # TODO: Check back later. No apple-m5 is available yet.
+    *"M5"*) CPU_FLAG="-O3 -mcpu=apple-m5" ;;
     *)      CPU_FLAG="-O3 -mcpu=native" ;;  # fallback for Intel
   esac
 
@@ -79,7 +79,7 @@ elif is_linux; then
 fi
 
 # Python / pyenv
-export PYTHON_CONFIGURE_OPTS="--enable-shared"
+export PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations --with-lto"
 have pyenv && eval "$(pyenv init -)"
 have pyenv && eval "$(pyenv init --path)"
 
