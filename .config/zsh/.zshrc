@@ -80,6 +80,9 @@ fi
 
 # Python / pyenv: PGO + LTO make `pyenv install` slower and the interpreter faster
 export PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations --with-lto"
+# uv: take the pyenv build over a uv-managed download; brew goes on PATH first so the pyenv shims land ahead of it
+export UV_PYTHON_PREFERENCE=system
+export PATH="$HOME/brew/bin:$PATH"
 have pyenv && eval "$(pyenv init -)"
 have pyenv && eval "$(pyenv init --path)"
 
@@ -138,8 +141,6 @@ source "$ZDOTDIR/prompt.zsh"
 #### Misc Shell Tweaks #########################################################
 stty -ixon
 setopt extended_glob
-
-export PATH="$HOME/brew/bin:$PATH"
 
 # zoxide
 have zoxide && eval "$(zoxide init zsh)"
