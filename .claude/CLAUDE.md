@@ -20,6 +20,12 @@ macOS Tahoe. Interactive shell: zsh with Oh-My-Zsh.
 - `curl` is installed via Homebrew (newer than the system `/usr/bin/curl`); modern curl flags are fine.
 - Use `rg` and `rg --files` for search when available.
 
+## Timezones
+
+- UTC is always the default for timestamps — responses, commands, queries, docs, commit and PR text. Label it (`14:30 UTC`, ISO 8601 with `Z`).
+- If another timezone is printed, it is US Eastern (ET) when the OS user is `rick-sroa`, US Pacific (PT) otherwise. Decide from `whoami`, not from the machine's clock zone.
+- Tools that print machine-local time (AWS CLI, `git log`, `ls -l`) get converted before quoting.
+
 ## Working Style
 
 - Read the relevant files before making assumptions.
@@ -37,13 +43,14 @@ macOS Tahoe. Interactive shell: zsh with Oh-My-Zsh.
 
 Multiple agent sessions often share one checkout. Treat uncommitted changes this session did not make as another session's work in progress.
 
-- Before the first edit, check `git status`. If the tree is dirty with changes you did not make — and the task is not about those changes — do the work in an isolated git worktree: prefer the harness's native mechanism (Claude Code: `EnterWorktree`; subagents: worktree isolation), otherwise `git worktree add ../<repo>-<task> -b <branch>`.
+- Always do file-editing work in an isolated git worktree, even when `git status` is clean — another session can start in the same checkout at any moment. Prefer the harness's native mechanism (Claude Code: `EnterWorktree`; subagents: worktree isolation), otherwise `git worktree add ../<repo>-<task> -b <branch>`.
 - Read-only and advisory tasks need no worktree.
 - A fresh worktree has no untracked or ignored files (`.env`, `.venv`, `node_modules`); re-run project setup there only if the task needs it.
 - Do not fold other sessions' changes into your task: never review, fix, revert, commit, stash, or report them as anomalies. Stage only files you edited, by explicit path — never `git add -A`, `git stash`, or `git checkout .` in a shared checkout.
 - When summarizing or diffing your work, enumerate the files you touched instead of diffing the whole tree.
 - Worktrees branch from HEAD, so pre-existing dirty changes will not be visible there. If those changes overlap files your task must edit, proceed but note the overlap in your summary.
-- Remove worktrees you created once the work is merged or abandoned (`git worktree remove <path>`).
+- Remove a worktree as soon as its work is merged or abandoned: `git worktree remove <path>` then `git branch -d <branch>`. Do this at the end of the task, not "later".
+- Whenever you notice a worktree's branch or PR is merged or closed — reviewing `git worktree list`, `gh pr status`, or a `[gone]` upstream — remove that worktree and its local branch, including worktrees you did not create. Skip only a worktree with uncommitted or unpushed work; report those instead. Finish with `git worktree prune`. `/clean_gone` does this sweep in one shot.
 
 ## Modal Behaviors
 

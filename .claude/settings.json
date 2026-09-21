@@ -1,6 +1,6 @@
 {
   "skillListingBudgetFraction": 0.05,
-  "model": "fable[1m]",
+  "model": "claude-fable-5-1[1m]",
   "disableClaudeAiConnectors": true,
   "enableWorkflows": true,
   "enabledPlugins": {
@@ -23,14 +23,13 @@
     "deploy-on-aws@claude-plugins-official": true,
     "terraform@claude-plugins-official": true,
     "aws-serverless@claude-plugins-official": true,
-    "pagerduty@claude-plugins-official": false,
+    "pagerduty@claude-plugins-official": true,
     "aws-core@claude-plugins-official": true,
     "redis-development@claude-plugins-official": false,
     "apollo-skills@claude-plugins-official": true,
     "aws-agents@claude-plugins-official": true,
     "aws-data-analytics@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": false,
-    "aws-dev-toolkit@claude-plugins-official": true,
     "databases-on-aws@claude-plugins-official": true,
     "sagemaker-ai@claude-plugins-official": true,
     "aws-transform@claude-plugins-official": true,
@@ -57,7 +56,6 @@
     "azure@claude-plugins-official": false,
     "code-modernization@claude-plugins-official": true,
     "exa@claude-plugins-official": false,
-    "neon@claude-plugins-official": false,
     "migration-to-aws@claude-plugins-official": false,
     "aws-amplify@claude-plugins-official": false,
     "duckdb-skills@claude-plugins-official": false,
@@ -67,7 +65,9 @@
     "aws-agents-for-devsecops@claude-plugins-official": true,
     "microsoft-docs@claude-plugins-official": true,
     "caveman@caveman": true,
-    "ponytail@ponytail": true
+    "ponytail@ponytail": true,
+    "data-agent-kit-starter-pack@claude-plugins-official": false,
+    "snowflake-cortex-code@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -95,6 +95,9 @@
       "effortLevel": "xhigh"
     },
     "claude-fable-5": {
+      "effortLevel": "xhigh"
+    },
+    "claude-fable-5-1": {
       "effortLevel": "xhigh"
     }
   },
