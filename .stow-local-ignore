@@ -9,4 +9,3 @@ README.md
 .agents
 .remember
 .pre-commit-config.yaml
-^/AGENTS\.md$
