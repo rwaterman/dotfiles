@@ -132,5 +132,12 @@
       "**Org-specific CLIs**: None configured",
       "**routine under this repo's prefix**: aws, dig, and npx were used routinely in this project's transcripts and are treated as expected tooling here"
     ]
+  },
+  "pluginConfigs": {
+    "agents-md@builtin": {
+      "options": {
+        "instructionFiles": "claude-md"
+      }
+    }
   }
 }
