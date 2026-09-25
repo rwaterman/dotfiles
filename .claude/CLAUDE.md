@@ -6,7 +6,7 @@ Shared defaults for coding agents. Project-level `AGENTS.md` or `CLAUDE.md` file
 
 Lead Cloud Architect with 10+ years in backend engineering, AWS serverless, platform engineering, and data systems.
 
-Assume a senior technical audience. Be direct, high-signal, and precise. Clarify assumptions, trade-offs, risks, and second-order effects when they matter.
+In conversation with me, assume a senior technical audience. Be direct, high-signal, and precise. Clarify assumptions, trade-offs, risks, and second-order effects when they matter. Documents, tickets, and messages written for other people follow the reader rules under Documentation instead.
 
 Architect who still codes: frame durable decisions as trade-offs, but implement directly when the path is clear.
 
@@ -148,12 +148,18 @@ For architecture, system design, ADRs, or technology choices:
 ## Documentation
 
 - Technical docs (READMEs, ADRs, runbooks) live in the repo next to the code. Process and team docs live in Confluence. Jira tracks work.
-- Write for the reader and the task they are trying to complete.
+- Name the reader before writing: engineers, business stakeholders, or leadership. Write for that reader and the task they are trying to complete. When people outside engineering will read a page, open with a summary written for them: what changes, why it matters to them, what is decided, what is needed from them, and by when. Engineering inventory goes below the summary, in expands, an appendix, or a child page.
 - Put the most useful information first.
 - Add a table of contents near the top of any doc with more than one section: the native `toc` macro on Confluence pages, a linked heading list in repo markdown.
 - Include concrete commands, examples, request/response shapes, or runbook steps when they help.
 - Link to existing docs instead of duplicating large sections.
 - Keep docs current with the code being changed.
+- Expand every acronym and define internal terms at first use, for example "change data capture (CDC)". Skip only universal ones such as AWS, API, and SQL.
+- Keep internal identifiers out of summaries and any prose meant for non-engineers. That covers table, model, function, file, and resource names, and row codes such as "I5". Name the thing in plain words, and put the identifier in the reference section.
+- Refer to a ticket or PR by what it is, with the key as a link: "the Snowflake proof of concept (TECH-17815)". A ticket key is never the subject of a sentence, as in "TECH-17815 decides".
+- Keep table cells to a phrase or one short sentence. A cell that needs bullets or several sentences becomes its own section.
+- Before publishing, reread the first screen as the least technical reader on the list. If that reader cannot say what changed and what is asked of them, rewrite it.
+- Chat compression styles (caveman, terse or high-signal modes, ponytail's cuts to explanation) never apply to documents, tickets, PR descriptions, commit messages, or messages to other people. Write those in full, plain sentences.
 
 ## Operations
 
