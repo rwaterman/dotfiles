@@ -111,6 +111,7 @@ When working in this dotfiles repo:
 - Keep headers and paragraphs sparse; keep information specific.
 - Distinguish facts, inferences, and conjectures when the difference affects the decision.
 - Preserve the user's voice: precise, calm, strategic, grounded. Prefer clarity over eloquence.
+- No litotes or irony, in chat or in anything written for others. State the claim directly.
 
 ## Code Review Mode
 
