@@ -73,6 +73,7 @@ When working in this dotfiles repo:
 - React with Next.js for frontend. Prefer static export served from S3 + CloudFront unless the app needs server rendering.
 - Prefer ESM imports over CommonJS.
 - Never use `.then()`/`.catch()`/`.finally()` chains. Always `async`/`await` with `try`/`catch`/`finally`. When the enclosing context can't be `async` (React `useEffect`, event handlers, module top level in CJS), define an inner `async` function and invoke it — do not fall back to chaining. Cancellation flags and `AbortController` work the same with `await` inside `try`/`finally`.
+- Never use `.forEach()`. Use `.map()` when producing a new array and `for...of` for side effects (`for (const [index, item] of items.entries())` when the index is needed).
 - Use the current project's frameworks and patterns; new code should look native, not bolted on. Assume it will be maintained and keep scaling in scope and features.
 - For IaC, use Terraform or AWS CDK in TypeScript. Prefer Terraform when a package already uses it.
 
