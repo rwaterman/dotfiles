@@ -23,6 +23,12 @@ plugins=(
   wd
 )
 
+if [[ ! -d "$ZSH" ]]; then
+  echo "Installing oh-my-zsh..."
+  git clone --depth=1 "https://github.com/ohmyzsh/ohmyzsh" "$ZSH" \
+    || echo "ERROR: failed to install oh-my-zsh" >&2
+fi
+
 source "$ZSH/oh-my-zsh.sh"
 
 
