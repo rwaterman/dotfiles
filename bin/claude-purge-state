@@ -3,11 +3,11 @@
 #
 # macOS only. Stops running Claude processes, then removes their state. Both
 # installs keep working: the apps, login and keychain credentials,
-# ~/.claude.json, settings, plugins, skills and project worktrees are left alone.
+# ~/.claude.json, settings, plugins and skills are left alone.
 #
-#   claude-purge-state                          dry run (default)
-#   claude-purge-state --execute                purge, after typed confirmation
-#   claude-purge-state --execute --include-vm   also drop the ~10G VM bundles
+#   claude-purge-state                              dry run (default)
+#   claude-purge-state --execute                    purge, after typed confirmation
+#   claude-purge-state --execute --force-worktrees  purge even with unsaved worktree work
 set -eu
 
 if [ "$(uname -s)" != Darwin ]; then
@@ -18,35 +18,33 @@ fi
 : "${HOME:?claude-purge-state: HOME is not set}"
 
 DRY=1
-INCLUDE_VM=0
 FORCE_WORKTREES=0
 
 usage() {
   cat <<'EOF'
-usage: claude-purge-state [--execute] [--include-vm] [--force-worktrees]
+usage: claude-purge-state [--execute] [--force-worktrees]
 
 macOS only.
 
   (no flags)          dry run: list every target with its size, change nothing
   --execute           stop Claude and purge; prompts for a typed PURGE confirmation
-  --include-vm        also remove Claude Desktop VM bundles (~10G, re-downloaded
-                      on next use)
-  --force-worktrees   proceed even if a git worktree inside a job or scratch
-                      directory has uncommitted changes
+  --force-worktrees   proceed even if a git worktree to be removed has
+                      uncommitted changes or commits that are on no remote
 
 Removed: session transcripts, per-project memory, prompt history, plans,
          Remember plugin history, background jobs and tasks, Desktop session
-         data, temp files, logs and regenerable caches.
+         data and VM bundles, the git worktrees Claude created (under a
+         project .claude/worktrees/, a job or the scratch directory), temp
+         files, logs and regenerable caches.
 Kept:    the CLI and Desktop installs, login and keychain credentials,
-         ~/.claude.json, settings, plugins, skills, and git worktrees under
-         project .claude/ directories.
+         ~/.claude.json, settings, plugins, skills, the branches and commits
+         of removed worktrees, and git worktrees anywhere else.
 EOF
 }
 
 for arg in "$@"; do
   case $arg in
     --execute) DRY=0 ;;
-    --include-vm) INCLUDE_VM=1 ;;
     --force-worktrees) FORCE_WORKTREES=1 ;;
     -h|--help) usage; exit 0 ;;
     *) printf 'claude-purge-state: unknown option: %s\n\n' "$arg" >&2; usage >&2; exit 2 ;;
@@ -70,8 +68,12 @@ SCRATCH=/private/tmp/claude-$(id -u)
 # Named so the $TMPDIR/claude-* sweep below can never match this directory.
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/purge-claude-state.XXXXXX")
 TARGETS=$TMP/targets
+WORKTREE_ROOTS=$TMP/worktree-roots
+WORKTREES=$TMP/worktrees
 UNSAFE=$TMP/unsafe
 : >"$TARGETS"
+: >"$WORKTREE_ROOTS"
+: >"$WORKTREES"
 : >"$UNSAFE"
 trap 'rm -rf "$TMP"' EXIT INT TERM
 
@@ -87,36 +89,62 @@ human() {
   }'
 }
 
-# --- guard 2: refuse to destroy uncommitted work in job worktrees ----------
-# A background job can check out a linked git worktree inside its job or
-# scratch directory. Its commits live in the parent repo and survive the purge;
-# files that were never committed do not.
+# --- discover the git worktrees Claude created ------------------------------
+# Claude Code checks out linked worktrees under <repo>/.claude/worktrees/, and
+# a background job can check one out inside its job or scratch directory.
+# Enumerated at run time, never hardcoded. A worktree anywhere else cannot be
+# told apart from one made by hand, so it is left alone.
+
+# record a linked worktree (git-common-dir<TAB>path<TAB>branch<TAB>dirty<TAB>unpushed)
+record_worktree() {
+  wt=$1
+  common=$(git -C "$wt" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 0
+  branch=$(git -C "$wt" symbolic-ref -q --short HEAD 2>/dev/null || echo 'detached HEAD')
+  # .remember is Remember plugin history that this purge removes anyway, so it
+  # does not count as unsaved work.
+  dirty=$(git -C "$wt" status --porcelain -- . ':(exclude).remember' 2>/dev/null | wc -l | tr -d ' ')
+  # Commits reachable from HEAD and from no remote-tracking branch. Counting
+  # against every remote needs no configured upstream and covers a detached HEAD.
+  unpushed=$(git -C "$wt" rev-list --count HEAD --not --remotes 2>/dev/null || echo 0)
+  printf '%s\t%s\t%s\t%s\t%s\n' "$common" "$wt" "$branch" "$dirty" "$unpushed" >>"$WORKTREES"
+}
+
+find "$HOME/git" -maxdepth 5 -type d \( -name node_modules -o -name .git -o -name .venv \) -prune \
+  -o -type d -path '*/.claude/worktrees' -print -prune 2>/dev/null >"$WORKTREE_ROOTS" || true
+
+while IFS= read -r root; do
+  for wt in "$root"/*; do
+    if [ -f "$wt/.git" ]; then record_worktree "$wt"; fi
+  done
+done <"$WORKTREE_ROOTS"
+
 for root in "$CLAUDE_HOME/jobs" "$SCRATCH"; do
   [ -d "$root" ] || continue
   find "$root" -maxdepth 6 -type f -name .git 2>/dev/null \
-    | while IFS= read -r gitfile; do
-        wt=$(dirname "$gitfile")
-        dirty=$(git -C "$wt" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
-        if [ "$dirty" -gt 0 ]; then
-          printf '%s\t%s\n' "$wt" "$dirty" >>"$UNSAFE"
-        fi
-      done
+    | while IFS= read -r gitfile; do record_worktree "$(dirname "$gitfile")"; done
 done
+
+# --- guard 2: refuse to destroy unsaved work in those worktrees ------------
+# Removing a worktree leaves its branch and commits in the parent repo, but
+# files that were never committed go with the directory. Commits on no remote
+# are held to the same bar: on a detached HEAD they become unreachable, and on
+# a branch nothing is left to prompt the push.
+awk -F'\t' '$4 > 0 || $5 > 0' "$WORKTREES" >"$UNSAFE"
 
 if [ -s "$UNSAFE" ] && [ "$FORCE_WORKTREES" -eq 0 ]; then
   if [ "$DRY" -eq 1 ]; then
-    printf 'WARNING — uncommitted work in git worktrees that would be removed\n\n' >&2
+    printf 'WARNING — unsaved work in git worktrees that would be removed\n\n' >&2
   else
-    printf 'claude-purge-state: REFUSING — uncommitted work in git worktrees that would be removed\n\n' >&2
+    printf 'claude-purge-state: REFUSING — unsaved work in git worktrees that would be removed\n\n' >&2
   fi
-  while IFS="$(printf '\t')" read -r wt dirty; do
-    printf '  %s — %s uncommitted file(s)\n' "$wt" "$dirty" >&2
+  while IFS="$(printf '\t')" read -r _common wt branch dirty unpushed; do
+    printf '  %s\n    %s — %s uncommitted file(s), %s unpushed commit(s)\n' "$wt" "$branch" "$dirty" "$unpushed" >&2
   done <"$UNSAFE"
   if [ "$DRY" -eq 0 ]; then
-    printf '\n  Commit or copy this work first, or re-run with --force-worktrees.\n' >&2
+    printf '\n  Commit and push this work first, or re-run with --force-worktrees.\n' >&2
     exit 1
   fi
-  printf '\n  --execute would refuse until this is committed, copied out, or forced.\n\n' >&2
+  printf '\n  --execute would refuse until this is committed and pushed, or forced.\n\n' >&2
 fi
 
 # --- build the target list -------------------------------------------------
@@ -160,6 +188,7 @@ for f in "$HOME"/.claude.json.tmp.*; do target "$f"; done
 target "$HOME/.claude-server-commander/tool-history.jsonl"
 target "$HOME/.claude-server-commander/claude_tool_call.log"
 target "$SCRATCH"
+target "/private/tmp/claude-mcp-browser-bridge-$(id -un)"
 if [ -n "${TMPDIR:-}" ]; then
   for d in "${TMPDIR%/}"/claude-*; do target "$d"; done
 fi
@@ -203,11 +232,12 @@ done
 target "$DESKTOP/claude-code-sessions"
 target "$DESKTOP/pending-uploads"
 
-# 6. opt-in: VM bundles
-if [ "$INCLUDE_VM" -eq 1 ]; then
-  target "$DESKTOP/vm_bundles"
-  target "$DESKTOP/claude-code-vm"
-fi
+# 6. Claude Desktop VM
+# The disk image, kernel and initrd are pinned downloads that Desktop fetches
+# again (about 1.2G) the next time a session needs the VM. sessiondata.img is
+# the VM's own persistent disk: it is state, and it comes back empty.
+target "$DESKTOP/vm_bundles"
+target "$DESKTOP/claude-code-vm"
 
 # --- report ----------------------------------------------------------------
 total=0
@@ -215,6 +245,26 @@ count=0
 
 printf '\n'
 [ "$DRY" -eq 1 ] && printf 'DRY RUN — nothing will be removed.\n\n'
+
+if [ -s "$WORKTREES" ]; then
+  printf 'Git worktrees to remove (branches and commits stay in the parent repo):\n'
+  while IFS="$(printf '\t')" read -r _common wt branch dirty unpushed; do
+    case $wt in
+      # Already counted inside the jobs and scratch targets below.
+      "$CLAUDE_HOME"/jobs/*|"$SCRATCH"/*) size=- ;;
+      *) kb=$(kb_of "$wt"); size=$(human "$kb"); total=$((total + kb)) ;;
+    esac
+    if [ "$dirty" -gt 0 ] || [ "$unpushed" -gt 0 ]; then
+      state="$dirty uncommitted file(s), $unpushed unpushed commit(s)"
+    else
+      state='clean and pushed'
+    fi
+    printf '  %8s  %s\n            %s — %s\n' "$size" "$wt" "$branch" "$state"
+    count=$((count + 1))
+  done <"$WORKTREES"
+  printf '\n'
+fi
+
 printf 'Paths to remove:\n'
 
 while IFS= read -r p; do
@@ -235,15 +285,7 @@ else
 fi
 
 printf '\nTotal: %s across %s target(s)\n' "$(human "$total")" "$count"
-
-if [ "$INCLUDE_VM" -eq 0 ]; then
-  vm=$(kb_of "$DESKTOP/vm_bundles")
-  vmc=$(kb_of "$DESKTOP/claude-code-vm")
-  sum=$((${vm:-0} + ${vmc:-0}))
-  [ "$sum" -gt 0 ] && printf 'Skipped: %s of VM bundles (add --include-vm to clear)\n' "$(human "$sum")"
-fi
-
-printf 'Kept: installs, login, keychain, ~/.claude.json, settings, plugins, skills, project worktrees\n'
+printf 'Kept: installs, login, keychain, ~/.claude.json, settings, plugins, skills, worktrees outside .claude/worktrees\n'
 
 if [ "$DRY" -eq 1 ]; then
   printf '\nRe-run with --execute to proceed.\n'
@@ -276,8 +318,23 @@ pkill -9 -f 'claude daemon' 2>/dev/null || true
 pkill -9 -x claude 2>/dev/null || true
 pkill -9 -x Claude 2>/dev/null || true
 
-# --- remove ----------------------------------------------------------------
+# --- git worktrees ---------------------------------------------------------
+# Deregistered through git, because removing only the directory leaves a
+# dangling entry in the parent repo. The second --force covers a locked
+# worktree. Git refuses one that holds submodules, so that case falls back to
+# rm -rf and the prune that follows clears its entry.
 printf '\n'
+if [ -s "$WORKTREES" ]; then
+  while IFS="$(printf '\t')" read -r common wt _branch _dirty _unpushed; do
+    printf 'removing worktree %s\n' "$wt"
+    git --git-dir="$common" worktree remove --force --force "$wt" 2>/dev/null || rm -rf "$wt"
+  done <"$WORKTREES"
+  cut -f1 "$WORKTREES" | sort -u | while IFS= read -r common; do
+    git --git-dir="$common" worktree prune 2>/dev/null || true
+  done
+fi
+
+# --- remove ----------------------------------------------------------------
 while IFS= read -r p; do
   [ -n "$p" ] || continue
   printf 'removing %s\n' "$p"
