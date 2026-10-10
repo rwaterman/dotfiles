@@ -127,9 +127,17 @@ target "$CLAUDE_HOME/history.jsonl"
 target "$CLAUDE_HOME/plans"
 target "$CLAUDE_HOME/file-history"
 for d in "$HOME"/.claude.bak-*; do target "$d"; done
-target "$HOME/.remember"
+# ~/.remember is also the Remember plugin's user config home, so its
+# config.json stays; everything else in it is history.
+for f in "$HOME/.remember"/*; do
+  case $f in
+    */config.json) continue ;;
+  esac
+  target "$f"
+done
 # Remember plugin history, one directory per project it has run in. Enumerated
 # at run time; the depth reaches worktrees under <repo>/.claude/worktrees/.
+# The plugin rebuilds each directory on its next hook run.
 find "$HOME/git" -maxdepth 8 -type d \( -name node_modules -o -name .git -o -name .venv \) -prune \
   -o -type d -name .remember -print 2>/dev/null >>"$TARGETS" || true
 
