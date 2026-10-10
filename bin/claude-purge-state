@@ -1,0 +1,279 @@
+#!/bin/sh
+# Clear Claude Code / Claude Desktop memory, history, jobs, temp files and caches.
+#
+# macOS only. Stops running Claude processes, then removes their state. Both
+# installs keep working: the apps, login and keychain credentials,
+# ~/.claude.json, settings, plugins, skills and project worktrees are left alone.
+#
+#   claude-purge-state                          dry run (default)
+#   claude-purge-state --execute                purge, after typed confirmation
+#   claude-purge-state --execute --include-vm   also drop the ~10G VM bundles
+set -eu
+
+if [ "$(uname -s)" != Darwin ]; then
+  printf 'claude-purge-state: macOS only (this is %s). Nothing was changed.\n' "$(uname -s)" >&2
+  exit 1
+fi
+
+: "${HOME:?claude-purge-state: HOME is not set}"
+
+DRY=1
+INCLUDE_VM=0
+FORCE_WORKTREES=0
+
+usage() {
+  cat <<'EOF'
+usage: claude-purge-state [--execute] [--include-vm] [--force-worktrees]
+
+macOS only.
+
+  (no flags)          dry run: list every target with its size, change nothing
+  --execute           stop Claude and purge; prompts for a typed PURGE confirmation
+  --include-vm        also remove Claude Desktop VM bundles (~10G, re-downloaded
+                      on next use)
+  --force-worktrees   proceed even if a git worktree inside a job or scratch
+                      directory has uncommitted changes
+
+Removed: session transcripts, per-project memory, prompt history, plans,
+         Remember plugin history, background jobs and tasks, Desktop session
+         data, temp files, logs and regenerable caches.
+Kept:    the CLI and Desktop installs, login and keychain credentials,
+         ~/.claude.json, settings, plugins, skills, and git worktrees under
+         project .claude/ directories.
+EOF
+}
+
+for arg in "$@"; do
+  case $arg in
+    --execute) DRY=0 ;;
+    --include-vm) INCLUDE_VM=1 ;;
+    --force-worktrees) FORCE_WORKTREES=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) printf 'claude-purge-state: unknown option: %s\n\n' "$arg" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+# --- guard 1: never execute from inside a Claude Code session ---------------
+# The purge stops every Claude process; run from a Claude Code session it would
+# terminate its own parent mid-run, leaving the removal half-finished.
+# Dry runs are harmless, so they stay allowed from anywhere.
+if [ "$DRY" -eq 0 ] && [ -n "${CLAUDECODE:-}${CLAUDE_CODE_SESSION_ID:-}${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
+  printf 'claude-purge-state: refusing to run inside a Claude Code session.\n' >&2
+  printf '                    Re-run from a plain terminal; it stops Claude itself.\n' >&2
+  exit 1
+fi
+
+CLAUDE_HOME=$HOME/.claude
+DESKTOP="$HOME/Library/Application Support/Claude"
+SCRATCH=/private/tmp/claude-$(id -u)
+
+# Named so the $TMPDIR/claude-* sweep below can never match this directory.
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/purge-claude-state.XXXXXX")
+TARGETS=$TMP/targets
+UNSAFE=$TMP/unsafe
+: >"$TARGETS"
+: >"$UNSAFE"
+trap 'rm -rf "$TMP"' EXIT INT TERM
+
+kb_of() { du -sk "$1" 2>/dev/null | cut -f1 || echo 0; }
+
+target() { [ -e "$1" ] || [ -L "$1" ] || return 0; printf '%s\n' "$1" >>"$TARGETS"; }
+
+human() {
+  awk -v k="$1" 'BEGIN{
+    if (k >= 1048576) printf "%.1fG", k/1048576;
+    else if (k >= 1024) printf "%.0fM", k/1024;
+    else printf "%dK", k
+  }'
+}
+
+# --- guard 2: refuse to destroy uncommitted work in job worktrees ----------
+# A background job can check out a linked git worktree inside its job or
+# scratch directory. Its commits live in the parent repo and survive the purge;
+# files that were never committed do not.
+for root in "$CLAUDE_HOME/jobs" "$SCRATCH"; do
+  [ -d "$root" ] || continue
+  find "$root" -maxdepth 6 -type f -name .git 2>/dev/null \
+    | while IFS= read -r gitfile; do
+        wt=$(dirname "$gitfile")
+        dirty=$(git -C "$wt" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+        if [ "$dirty" -gt 0 ]; then
+          printf '%s\t%s\n' "$wt" "$dirty" >>"$UNSAFE"
+        fi
+      done
+done
+
+if [ -s "$UNSAFE" ] && [ "$FORCE_WORKTREES" -eq 0 ]; then
+  if [ "$DRY" -eq 1 ]; then
+    printf 'WARNING — uncommitted work in git worktrees that would be removed\n\n' >&2
+  else
+    printf 'claude-purge-state: REFUSING — uncommitted work in git worktrees that would be removed\n\n' >&2
+  fi
+  while IFS="$(printf '\t')" read -r wt dirty; do
+    printf '  %s — %s uncommitted file(s)\n' "$wt" "$dirty" >&2
+  done <"$UNSAFE"
+  if [ "$DRY" -eq 0 ]; then
+    printf '\n  Commit or copy this work first, or re-run with --force-worktrees.\n' >&2
+    exit 1
+  fi
+  printf '\n  --execute would refuse until this is committed, copied out, or forced.\n\n' >&2
+fi
+
+# --- build the target list -------------------------------------------------
+
+# 1. memory and history
+target "$CLAUDE_HOME/projects"                # session transcripts and per-project memory/
+target "$CLAUDE_HOME/history.jsonl"
+target "$CLAUDE_HOME/plans"
+target "$CLAUDE_HOME/file-history"
+for d in "$HOME"/.claude.bak-*; do target "$d"; done
+target "$HOME/.remember"
+# Remember plugin history, one directory per project it has run in. Enumerated
+# at run time; the depth reaches worktrees under <repo>/.claude/worktrees/.
+find "$HOME/git" -maxdepth 8 -type d \( -name node_modules -o -name .git -o -name .venv \) -prune \
+  -o -type d -name .remember -print 2>/dev/null >>"$TARGETS" || true
+
+# 2. jobs and session state
+target "$CLAUDE_HOME/jobs"
+target "$CLAUDE_HOME/tasks"
+target "$CLAUDE_HOME/sessions"
+target "$CLAUDE_HOME/daemon/roster.json"
+target "$CLAUDE_HOME/daemon/dispatch"
+target "$CLAUDE_HOME/daemon/attach-journal"
+target "$CLAUDE_HOME/daemon.log"
+
+# 3. temp files and logs
+target "$CLAUDE_HOME/telemetry"
+target "$CLAUDE_HOME/backups"
+target "$CLAUDE_HOME/feedback"
+target "$CLAUDE_HOME/security"                # plugin logs, per-session state, regenerable venv
+target "$HOME/.claude.json.backup"
+for f in "$HOME"/.claude.json.tmp.*; do target "$f"; done
+target "$HOME/.claude-server-commander/tool-history.jsonl"
+target "$HOME/.claude-server-commander/claude_tool_call.log"
+target "$SCRATCH"
+if [ -n "${TMPDIR:-}" ]; then
+  for d in "${TMPDIR%/}"/claude-*; do target "$d"; done
+fi
+target "$HOME/Library/Logs/Claude"
+
+# 4. regenerable caches
+# plugins/cache is the installed plugin code rather than disposable state;
+# claude-clean-cache clears it when that is wanted.
+target "$CLAUDE_HOME/cache"
+target "$CLAUDE_HOME/paste-cache"
+target "$CLAUDE_HOME/shell-snapshots"
+target "$CLAUDE_HOME/session-env"
+target "$CLAUDE_HOME/gh-pr-status-cache.json"
+target "$CLAUDE_HOME/mcp-needs-auth-cache.json"
+target "$CLAUDE_HOME/stats-cache.json"
+target "$CLAUDE_HOME/plugins/plugin-catalog-cache.json"
+target "$HOME/Library/Caches/claude-cli-nodejs"
+target "$HOME/Library/Caches/com.anthropic.claudefordesktop"
+target "$HOME/Library/Caches/com.anthropic.claudefordesktop.ShipIt"
+# Deliberately excluded: Cookies, Local Storage, IndexedDB, Session Storage and
+# Partitions hold the Desktop login session — removing them signs you out.
+target "$DESKTOP/Cache"
+target "$DESKTOP/Code Cache"
+target "$DESKTOP/GPUCache"
+target "$DESKTOP/DawnGraphiteCache"
+target "$DESKTOP/DawnWebGPUCache"
+target "$DESKTOP/fcache"
+target "$DESKTOP/blob_storage"
+target "$DESKTOP/Shared Dictionary"
+target "$DESKTOP/shared_proto_db"
+target "$DESKTOP/sentry"
+target "$DESKTOP/Crashpad"
+
+# 5. Claude Desktop session data
+for d in "$DESKTOP/local-agent-mode-sessions"/*; do
+  case $d in
+    */skills-plugin) continue ;;              # synced skills, not session data
+  esac
+  target "$d"
+done
+target "$DESKTOP/claude-code-sessions"
+target "$DESKTOP/pending-uploads"
+
+# 6. opt-in: VM bundles
+if [ "$INCLUDE_VM" -eq 1 ]; then
+  target "$DESKTOP/vm_bundles"
+  target "$DESKTOP/claude-code-vm"
+fi
+
+# --- report ----------------------------------------------------------------
+total=0
+count=0
+
+printf '\n'
+[ "$DRY" -eq 1 ] && printf 'DRY RUN — nothing will be removed.\n\n'
+printf 'Paths to remove:\n'
+
+while IFS= read -r p; do
+  [ -n "$p" ] || continue
+  kb=$(kb_of "$p")
+  printf '  %8s  %s\n' "$(human "$kb")" "$p"
+  total=$((total + kb)); count=$((count + 1))
+done <"$TARGETS"
+
+printf '\nClaude processes to stop:\n'
+pids=$({ pgrep -x claude; pgrep -x Claude; pgrep -f 'claude daemon'; } 2>/dev/null | sort -u || true)
+if [ -n "$pids" ]; then
+  for pid in $pids; do
+    ps -o pid=,args= -p "$pid" 2>/dev/null | cut -c1-110 | sed 's/^/  /' || true
+  done
+else
+  printf '  (none running)\n'
+fi
+
+printf '\nTotal: %s across %s target(s)\n' "$(human "$total")" "$count"
+
+if [ "$INCLUDE_VM" -eq 0 ]; then
+  vm=$(kb_of "$DESKTOP/vm_bundles")
+  vmc=$(kb_of "$DESKTOP/claude-code-vm")
+  sum=$((${vm:-0} + ${vmc:-0}))
+  [ "$sum" -gt 0 ] && printf 'Skipped: %s of VM bundles (add --include-vm to clear)\n' "$(human "$sum")"
+fi
+
+printf 'Kept: installs, login, keychain, ~/.claude.json, settings, plugins, skills, project worktrees\n'
+
+if [ "$DRY" -eq 1 ]; then
+  printf '\nRe-run with --execute to proceed.\n'
+  exit 0
+fi
+
+# --- confirm ---------------------------------------------------------------
+printf '\nThis is irreversible. Type PURGE to confirm: '
+read -r reply || reply=
+if [ "$reply" != "PURGE" ]; then
+  printf 'Aborted.\n'
+  exit 1
+fi
+
+# --- stop running processes ------------------------------------------------
+# A live session rewrites its transcript and memory on exit, so everything has
+# to be gone before the first removal.
+printf 'Stopping Claude processes...\n'
+pkill -f 'claude daemon' 2>/dev/null || true
+pkill -x claude 2>/dev/null || true
+pkill -x Claude 2>/dev/null || true
+i=0
+while [ "$i" -lt 20 ]; do
+  pgrep -x claude >/dev/null 2>&1 || pgrep -x Claude >/dev/null 2>&1 \
+    || pgrep -f 'claude daemon' >/dev/null 2>&1 || break
+  i=$((i + 1))
+  sleep 0.5
+done
+pkill -9 -f 'claude daemon' 2>/dev/null || true
+pkill -9 -x claude 2>/dev/null || true
+pkill -9 -x Claude 2>/dev/null || true
+
+# --- remove ----------------------------------------------------------------
+printf '\n'
+while IFS= read -r p; do
+  [ -n "$p" ] || continue
+  printf 'removing %s\n' "$p"
+  rm -rf "$p"
+done <"$TARGETS"
+
+printf '\nPurged %s. Claude recreates what it needs on next launch.\n' "$(human "$total")"
