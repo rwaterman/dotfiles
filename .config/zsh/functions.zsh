@@ -14,20 +14,27 @@ calc() {
 git_pull_base_branch() {
   emulate -L zsh
   local repo="${1:-$PWD}"
+  local heads
+  heads=$(git -C "$repo" ls-remote --heads origin) || {
+    print -u2 "git_pull_base_branch: cannot list branches on origin for $repo"
+    return 1
+  }
+  local -a branches=(${${(f)heads}#*$'\t'refs/heads/})
   local base candidate
   for candidate in develop main master; do
-    if git -C "$repo" show-ref --verify -q "refs/remotes/origin/$candidate"; then
+    if (( ${branches[(Ie)$candidate]} )); then
       base=$candidate
       break
     fi
   done
   if [[ -z "$base" ]]; then
-    print -u2 "git_pull_base_branch: no origin/develop, origin/main or origin/master in $repo"
+    print -u2 "git_pull_base_branch: origin has no develop, main or master branch for $repo"
     return 1
   fi
 
   if [[ "$(git -C "$repo" symbolic-ref -q --short HEAD)" == "$base" ]]; then
-    git -C "$repo" pull --ff-only origin "$base"
+    git -C "$repo" fetch origin "$base" &&
+      git -C "$repo" merge --ff-only --no-autostash --no-overwrite-ignore FETCH_HEAD
   else
     git -C "$repo" fetch origin "$base:$base"
   fi
