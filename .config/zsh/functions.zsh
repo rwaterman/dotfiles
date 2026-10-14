@@ -10,28 +10,28 @@ calc() {
   bc -l <<<"scale=10;$calc"
 }
 
-# Fast-forward a repo's develop (or main) from origin without switching branches or touching uncommitted work
-git_update_default_branch() {
+# Fast-forward a repo's local develop (or main) from origin without switching branches or touching uncommitted work
+git_pull_base_branch() {
   emulate -L zsh
   local repo="${1:-$PWD}"
-  local default
+  local base
   if git -C "$repo" show-ref --verify -q refs/remotes/origin/develop; then
-    default=develop
+    base=develop
   elif git -C "$repo" show-ref --verify -q refs/remotes/origin/main; then
-    default=main
+    base=main
   else
-    print -u2 "git_update_default_branch: no origin/develop or origin/main in $repo"
+    print -u2 "git_pull_base_branch: no origin/develop or origin/main in $repo"
     return 1
   fi
 
-  if [[ "$(git -C "$repo" symbolic-ref -q --short HEAD)" == "$default" ]]; then
-    git -C "$repo" pull --ff-only origin "$default"
+  if [[ "$(git -C "$repo" symbolic-ref -q --short HEAD)" == "$base" ]]; then
+    git -C "$repo" pull --ff-only origin "$base"
   else
-    git -C "$repo" fetch origin "$default:$default"
+    git -C "$repo" fetch origin "$base:$base"
   fi
 }
 
-# Update the default branch of every repo one level below a directory (default: $PWD).
+# Pull the base branch of every repo one level below a directory (default: $PWD).
 # Linked worktrees share their main repo's branches, so only main repos are visited.
 git_pull_all() {
   emulate -L zsh
@@ -43,7 +43,7 @@ git_pull_all() {
   for dir in "$root"/*(N/); do
     [[ -d "$dir/.git" ]] || continue
     print -P "%F{cyan}==> ${dir:t}%f"
-    git_update_default_branch "$dir" || failed+=("${dir:t}")
+    git_pull_base_branch "$dir" || failed+=("${dir:t}")
   done
 
   (( ${#failed} )) || return 0
