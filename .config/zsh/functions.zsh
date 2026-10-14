@@ -10,17 +10,19 @@ calc() {
   bc -l <<<"scale=10;$calc"
 }
 
-# Fast-forward a repo's local develop (or main) from origin without switching branches or touching uncommitted work
+# Fast-forward a repo's local develop, main or master (first found on origin) without switching branches or touching uncommitted work
 git_pull_base_branch() {
   emulate -L zsh
   local repo="${1:-$PWD}"
-  local base
-  if git -C "$repo" show-ref --verify -q refs/remotes/origin/develop; then
-    base=develop
-  elif git -C "$repo" show-ref --verify -q refs/remotes/origin/main; then
-    base=main
-  else
-    print -u2 "git_pull_base_branch: no origin/develop or origin/main in $repo"
+  local base candidate
+  for candidate in develop main master; do
+    if git -C "$repo" show-ref --verify -q "refs/remotes/origin/$candidate"; then
+      base=$candidate
+      break
+    fi
+  done
+  if [[ -z "$base" ]]; then
+    print -u2 "git_pull_base_branch: no origin/develop, origin/main or origin/master in $repo"
     return 1
   fi
 
