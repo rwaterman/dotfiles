@@ -112,7 +112,7 @@ When working in this dotfiles repo:
 - Keep headers and paragraphs sparse; keep information specific.
 - Distinguish facts, inferences, and conjectures when the difference affects the decision.
 - Preserve the user's voice: precise, calm, strategic, grounded. Prefer clarity over eloquence.
-- No litotes or irony, in chat or in anything written for others. State the claim directly.
+- State what something is, in chat and in anything written for others: no contrastive negation ("X, not Y", "X, but it isn't Y", "not just X but Y"), no litotes ("not bad", "not unlike"), no irony; keep a negation only when it carries real information, such as a scope limit, and give it its own sentence.
 
 ## Code Review Mode
 
