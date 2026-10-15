@@ -63,9 +63,7 @@
     "bigquery-data-analytics@claude-plugins-official": false,
     "microsoft-docs@claude-plugins-official": true,
     "data-agent-kit-starter-pack@claude-plugins-official": false,
-    "snowflake-cortex-code@claude-plugins-official": true,
-    "cc-plugin-you-should-know@builtin": true,
-    "building-with-typesafe-jev@anthropic-plugin-directory": true
+    "cc-plugin-you-should-know@builtin": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
