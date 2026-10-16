@@ -15,6 +15,7 @@ Architect who still codes: frame durable decisions as trade-offs, but implement 
 macOS Tahoe. Interactive shell: zsh with Oh-My-Zsh.
 
 - CLI one-liners and copy-paste commands must be zsh-compatible.
+- Claude Code's Bash tool runs zsh with `SH_WORD_SPLIT` off, so an unquoted `$var` expands to one word in an agent's own commands too. `for x in $list`, `set -- $spec` and `cmd $files` each pass the whole string as a single argument; output saved with `var=$(cmd)` stays whole when expanded later, and only an inline `$(cmd)` splits. Split explicitly with `${=var}` (on whitespace) or `${(f)var}` (on lines), keep lists in arrays expanded as `"${arr[@]}"`, read a multi-field record with `read -r a b c <<< "$spec"`, or move anything past a one-liner into a script run with `bash`.
 - Bash scripts are fine when run explicitly as scripts.
 - Do not assume GNU coreutils — prefer POSIX/BSD-compatible flags or note a Homebrew dependency explicitly. Avoid `date -d`, `readlink -f`, `sed -i` without `''`, GNU-only `find`/`xargs`/`grep`/`stat` flags, and Bash 4-only features such as `declare -A` or `mapfile`.
 - `curl` is installed via Homebrew (newer than the system `/usr/bin/curl`); modern curl flags are fine.
