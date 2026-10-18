@@ -87,7 +87,6 @@ fi
 # Python / pyenv
 export PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations --with-lto"
 have pyenv && eval "$(pyenv init -)"
-have pyenv && eval "$(pyenv init --path)"
 
 # GitHub CLI: expose token for tools that read GITHUB_PERSONAL_ACCESS_TOKEN (e.g. Claude Code's GitHub MCP plugin)
 have gh && export GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)"
@@ -144,8 +143,6 @@ source "$ZDOTDIR/prompt.zsh"
 #### Misc Shell Tweaks #########################################################
 stty -ixon
 setopt extended_glob
-
-export PATH="$HOME/brew/bin:$PATH"
 
 # zoxide
 have zoxide && eval "$(zoxide init zsh)"
