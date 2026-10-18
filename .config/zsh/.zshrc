@@ -84,8 +84,6 @@ elif is_linux; then
   export CXXFLAGS="${CXXFLAGS:--O3 -march=native}"
 fi
 
-# Homebrew: macOS /etc/zprofile runs path_helper after .zshenv and moves system dirs ahead of brew,
-# so re-prepend it here. Must stay above pyenv init so the pyenv shims end up first.
 export PATH="$HOME/brew/bin:$PATH"
 
 # Python / pyenv
