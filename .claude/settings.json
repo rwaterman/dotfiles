@@ -16,7 +16,7 @@
     "pyright-lsp@claude-plugins-official": false,
     "atlassian@claude-plugins-official": true,
     "slack@claude-plugins-official": false,
-    "hookify@claude-plugins-official": true,
+    "hookify@claude-plugins-official": false,
     "greptile@claude-plugins-official": true,
     "remember@claude-plugins-official": true,
     "deploy-on-aws@claude-plugins-official": true,
@@ -59,11 +59,14 @@
     "aws-amplify@claude-plugins-official": false,
     "duckdb-skills@claude-plugins-official": false,
     "aws-startup-advisor@claude-plugins-official": true,
-    "rootly@claude-plugins-official": true,
+    "rootly@claude-plugins-official": false,
     "bigquery-data-analytics@claude-plugins-official": false,
     "microsoft-docs@claude-plugins-official": true,
     "data-agent-kit-starter-pack@claude-plugins-official": false,
-    "cc-plugin-you-should-know@builtin": true
+    "cc-plugin-you-should-know@builtin": true,
+    "design@synced": false,
+    "engineering@synced": false,
+    "productivity@synced": false
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -82,7 +85,7 @@
       "effortLevel": "xhigh"
     },
     "claude-fable-5-1": {
-      "effortLevel": "xhigh"
+      "effortLevel": "high"
     },
     "claude-opus-5-5": {
       "effortLevel": "xhigh"
@@ -96,6 +99,7 @@
       }
     }
   },
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "inputNeededNotifEnabled": true,
@@ -127,5 +131,9 @@
       "**Org-specific CLIs**: None configured",
       "**routine under this repo's prefix**: aws, dig, and npx were used routinely in this project's transcripts and are treated as expected tooling here"
     ]
+  },
+  "model": "fable",
+  "permissions": {
+    "defaultMode": "auto"
   }
 }
