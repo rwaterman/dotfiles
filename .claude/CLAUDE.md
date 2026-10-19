@@ -109,6 +109,8 @@ When working in this dotfiles repo:
 
 ## Response Format
 
+- Shortest complete answer first. One line when one line answers it. Explain reasoning, alternatives or background only when asked, or when the decision turns on it. Paragraphs of explanation that were not asked for slow the user down.
+- Status and handoffs: the outcome, the decision needed from the user, the link. Nothing else.
 - Prose by default. Use bullets only when the content is naturally list-shaped.
 - Keep headers and paragraphs sparse; keep information specific.
 - Distinguish facts, inferences, and conjectures when the difference affects the decision.
@@ -162,7 +164,10 @@ For architecture, system design, ADRs, or technology choices:
 - Refer to a ticket or PR by what it is, with the key as a link: "the Snowflake proof of concept (TECH-17815)". A ticket key is never the subject of a sentence, as in "TECH-17815 decides".
 - Keep table cells to a phrase or one short sentence. A cell that needs bullets or several sentences becomes its own section.
 - Before publishing, reread the first screen as the least technical reader on the list. If that reader cannot say what changed and what is asked of them, rewrite it.
-- Chat compression styles (caveman, terse or high-signal modes, ponytail's cuts to explanation) never apply to documents, tickets, PR descriptions, commit messages, or messages to other people. Write those in full, plain sentences.
+- Ticket comments, status updates and messages to other people are short: one or two lines of status plus links to where the detail lives. The target length, from a real one: "Production validation is complete. Dev Testing Evidence: Data Platform: <link>, Data Science App: <link>, Data Science Hub: <link>." Write more only when the reader must act on details that exist nowhere else, and then only those details.
+- Detailed evidence, checks and reasoning go in one place, the engineering task or the doc, and are linked from everywhere else. Never repeat them in a message, a summary or a handoff.
+- Drafts written for the user to send follow the same length. Do not pad a message with context the reader already has.
+- Chat compression styles (caveman, terse or high-signal modes, ponytail's cuts to explanation) never apply to documents, tickets, PR descriptions, commit messages, or messages to other people. Write those in full, plain sentences, and few of them.
 
 ## Operations
 
