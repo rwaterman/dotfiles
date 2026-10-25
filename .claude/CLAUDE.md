@@ -110,6 +110,8 @@ When working in this dotfiles repo:
 ## Response Format
 
 - Shortest complete answer first. One line when one line answers it. Explain reasoning, alternatives or background only when asked, or when the decision turns on it. Paragraphs of explanation that were not asked for slow the user down.
+- A "how do I..." or "what's the command" question gets the command in one line, then stops. Give caveats, alternatives, and what you verified only when asked or when a missing caveat would cause damage.
+- Do not narrate checks, list what was and was not tested, or end with offers and follow-up questions unless the answer turns on them.
 - Status and handoffs: the outcome, the decision needed from the user, the link. Nothing else.
 - Prose by default. Use bullets only when the content is naturally list-shaped.
 - Keep headers and paragraphs sparse; keep information specific.
