@@ -3,7 +3,6 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "claude-fable-5-1",
   "disableClaudeAiConnectors": true,
   "enableWorkflows": true,
   "enabledPlugins": {
