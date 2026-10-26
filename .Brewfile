@@ -1,7 +1,6 @@
 tap "hashicorp/tap"
 brew "actionlint"
 brew "awk"
-brew "aws-cdk"
 brew "awscli"
 brew "awslogs"
 brew "bash"
