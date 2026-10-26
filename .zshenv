@@ -30,5 +30,5 @@ esac
 export SSL_CERT_FILE="/etc/ssl/cert.pem"
 
 # PATH
-export PATH="$HOME/brew/bin:$HOME/brew/sbin:$HOME/bin:$HOME/.local/bin:$HOME/.pyenv/bin:$HOME/brew/opt/curl/bin:$PATH"
+export PATH="$HOME/brew/bin:$HOME/brew/sbin:$HOME/bin:$HOME/.local/bin:$HOME/.pyenv/bin:$HOME/brew/opt/curl/bin:$HOME/brew/opt/rustup/bin:$PATH"
 
