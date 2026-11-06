@@ -11,7 +11,16 @@
 set -eu
 
 # Hooks may start without the login shell's PATH (e.g. Claude Desktop launched from Finder).
-PATH="$HOME/brew/bin:$HOME/.local/bin:$PATH"
+# Keep only absolute entries: hooks run inside the project, so a relative entry could run a repo-planted node.
+safe_path="$HOME/brew/bin:$HOME/.local/bin"
+set -f
+IFS=:
+for dir in $PATH; do
+  case "$dir" in /*) safe_path="$safe_path:$dir" ;; esac
+done
+unset IFS
+set +f
+PATH=$safe_path
 
 proxy="$HOME/.caveman/bin/caveman-proxy"
 blocks="$HOME/.local/share/caveman-blocks/bin/caveman-blocks"
