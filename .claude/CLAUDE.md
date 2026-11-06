@@ -160,6 +160,7 @@ For architecture, system design, ADRs, or technology choices:
 - Add a table of contents near the top of any doc with more than one section: the native `toc` macro on Confluence pages, a linked heading list in repo markdown.
 - Include concrete commands, examples, request/response shapes, or runbook steps when they help.
 - Link to existing docs instead of duplicating large sections.
+- Related or See also sections list only items the reader needs for this task. Never link a ticket or doc just because it shares a vendor, tool, account or system.
 - Keep docs current with the code being changed.
 - Expand every acronym and define internal terms at first use, for example "change data capture (CDC)". Skip only universal ones such as AWS, API, and SQL.
 - Keep internal identifiers out of summaries and any prose meant for non-engineers. That covers table, model, function, file, and resource names, and row codes such as "I5". Name the thing in plain words, and put the identifier in the reference section.
