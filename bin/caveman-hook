@@ -1,0 +1,40 @@
+#!/bin/sh
+# Portable entry point for the caveman Claude Code hooks in .claude/settings.json.
+#
+# Resolves caveman binaries and the Node adapter at run time so the settings
+# carry no machine-specific paths (macOS Homebrew, Arch, Ubuntu, nvm).
+# Exits 0 without doing anything when caveman is not installed on this machine.
+#
+#   caveman-hook native   caveman-proxy native hook (all lifecycle events)
+#   caveman-hook shrink   caveman shrink-hook (PreToolUse)
+#   caveman-hook blocks   caveman-blocks hook (PreToolUse, Bash)
+set -eu
+
+# Hooks may start without the login shell's PATH (e.g. Claude Desktop launched from Finder).
+PATH="$HOME/brew/bin:$HOME/.local/bin:$PATH"
+
+proxy="$HOME/.caveman/bin/caveman-proxy"
+blocks="$HOME/.local/share/caveman-blocks/bin/caveman-blocks"
+
+case "${1:-}" in
+  native)
+    [ -x "$proxy" ] || exit 0
+    node_bin=$(command -v node) || { echo "caveman-hook: node not found on PATH" >&2; exit 1; }
+    # npm's default global prefix is the directory above node's bin/.
+    adapter="$(dirname "$(dirname "$node_bin")")/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js"
+    [ -f "$adapter" ] || { echo "caveman-hook: adapter not found at $adapter" >&2; exit 1; }
+    exec "$proxy" native-hook claude --adapter "$adapter" --node "$node_bin"
+    ;;
+  shrink)
+    command -v caveman >/dev/null 2>&1 || exit 0
+    exec caveman shrink-hook
+    ;;
+  blocks)
+    [ -x "$blocks" ] || exit 0
+    exec "$blocks" hook --harness claude
+    ;;
+  *)
+    echo "usage: caveman-hook native|shrink|blocks" >&2
+    exit 1
+    ;;
+esac

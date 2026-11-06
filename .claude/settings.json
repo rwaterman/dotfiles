@@ -59,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
@@ -70,7 +70,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
@@ -81,7 +81,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
@@ -90,7 +90,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/brew/bin/node $HOME/brew/bin/caveman shrink-hook",
+            "command": "$HOME/bin/caveman-hook shrink",
             "timeout": 30
           }
         ]
@@ -100,7 +100,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.local/share/caveman-blocks/bin/caveman-blocks hook --harness claude",
+            "command": "$HOME/bin/caveman-hook blocks",
             "timeout": 5
           }
         ]
@@ -111,7 +111,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
@@ -122,7 +122,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
@@ -133,7 +133,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
@@ -144,7 +144,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
@@ -155,7 +155,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
@@ -166,7 +166,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
@@ -177,7 +177,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "command": "$HOME/bin/caveman-hook native",
             "timeout": 30
           }
         ]
