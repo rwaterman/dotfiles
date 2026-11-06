@@ -1,25 +1,203 @@
 {
   "skillListingBudgetFraction": 0.05,
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:8787/w/claude",
+    "_CLAUDE_CODE_ASSUME_FIRST_PARTY_BASE_URL": "1",
+    "ENABLE_TOOL_SEARCH": "auto",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5-5"
+  },
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "claude-fable-5-1",
   "disableClaudeAiConnectors": true,
+  "skillOverrides": {
+    "aws-core:amazon-bedrock": "off",
+    "aws-core:aws-ai-ml": "off",
+    "aws-core:aws-auth": "off",
+    "aws-core:aws-billing-and-cost-management": "off",
+    "aws-core:aws-blocks": "off",
+    "aws-core:aws-cdk": "off",
+    "aws-core:aws-cloudformation": "off",
+    "aws-core:aws-compute": "off",
+    "aws-core:aws-containers": "off",
+    "aws-core:aws-database": "off",
+    "aws-core:aws-deployment": "off",
+    "aws-core:aws-iam": "off",
+    "aws-core:aws-messaging-and-streaming": "off",
+    "aws-core:aws-networking": "off",
+    "aws-core:aws-observability": "off",
+    "aws-core:aws-sdk-js-v3-usage": "off",
+    "aws-core:aws-sdk-python-usage": "off",
+    "aws-core:aws-sdk-swift-usage": "off",
+    "aws-core:aws-security": "off",
+    "aws-core:aws-serverless": "off",
+    "aws-core:aws-storage": "off",
+    "aws-core:aws-well-architected-review": "off",
+    "aws-core:launch-with-aws": "off",
+    "aws-core:signing-in-to-aws": "off",
+    "aws-serverless:api-gateway": "off",
+    "aws-serverless:aws-lambda": "off",
+    "aws-serverless:aws-lambda-durable-functions": "off",
+    "aws-serverless:aws-lambda-managed-instances": "off",
+    "aws-serverless:aws-lambda-microvms": "off",
+    "aws-serverless:aws-serverless-deployment": "off",
+    "deploy-on-aws:deploy": "off",
+    "deploy-on-aws:elastic-beanstalk": "off",
+    "databases-on-aws:dsql": "off",
+    "anthropic-skills:built-in-browser": "off",
+    "anthropic-skills:deep-research": "off",
+    "anthropic-skills:docs": "off",
+    "anthropic-skills:google-workspace": "off",
+    "anthropic-skills:import-memory": "off",
+    "anthropic-skills:morning": "off",
+    "anthropic-skills:skill-creator": "off",
+    "anthropic-skills:xlsx": "off"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/brew/bin/node $HOME/brew/bin/caveman shrink-hook",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.local/share/caveman-blocks/bin/caveman-blocks hook --harness claude",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.caveman/bin/caveman-proxy native-hook claude --adapter '/opt/brew/502/lib/node_modules/@caveman-ai/cli/dist/native-hook-fast.js' --node $HOME/brew/bin/node",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
   "enableWorkflows": true,
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
+    "code-review@claude-plugins-official": false,
+    "code-simplifier@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": false,
     "github@claude-plugins-official": false,
-    "claude-md-management@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": false,
+    "feature-dev@claude-plugins-official": false,
+    "typescript-lsp@claude-plugins-official": false,
     "security-guidance@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": false,
     "pyright-lsp@claude-plugins-official": false,
     "atlassian@claude-plugins-official": true,
-    "slack@claude-plugins-official": false,
     "hookify@claude-plugins-official": false,
     "greptile@claude-plugins-official": false,
     "remember@claude-plugins-official": true,
@@ -28,23 +206,20 @@
     "aws-serverless@claude-plugins-official": true,
     "pagerduty@claude-plugins-official": true,
     "aws-core@claude-plugins-official": true,
-    "redis-development@claude-plugins-official": false,
     "apollo-skills@claude-plugins-official": false,
     "aws-agents@claude-plugins-official": false,
-    "aws-data-analytics@claude-plugins-official": true,
+    "aws-data-analytics@claude-plugins-official": false,
     "swift-lsp@claude-plugins-official": false,
     "databases-on-aws@claude-plugins-official": true,
     "sagemaker-ai@claude-plugins-official": false,
     "aws-transform@claude-plugins-official": false,
     "commit-commands@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true,
-    "playground@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": false,
+    "claude-code-setup@claude-plugins-official": false,
+    "playground@claude-plugins-official": false,
     "context7@claude-plugins-official": false,
-    "vercel@claude-plugins-official": false,
-    "grafana-mcp@claude-plugins-official": false,
     "playwright@claude-plugins-official": false,
-    "ralph-loop@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": false,
     "desktop-commander@claude-plugins-official": false,
     "explanatory-output-style@claude-plugins-official": false,
     "chrome-devtools-mcp@claude-plugins-official": false,
@@ -54,29 +229,28 @@
     "php-lsp@claude-plugins-official": false,
     "mcp-server-dev@claude-plugins-official": false,
     "laravel-boost@claude-plugins-official": false,
-    "postman@claude-plugins-official": false,
-    "semgrep@claude-plugins-official": false,
-    "azure@claude-plugins-official": false,
     "code-modernization@claude-plugins-official": false,
-    "exa@claude-plugins-official": false,
-    "migration-to-aws@claude-plugins-official": false,
-    "aws-amplify@claude-plugins-official": false,
-    "duckdb-skills@claude-plugins-official": false,
     "aws-startup-advisor@claude-plugins-official": false,
     "rootly@claude-plugins-official": false,
-    "bigquery-data-analytics@claude-plugins-official": false,
     "microsoft-docs@claude-plugins-official": false,
     "data-agent-kit-starter-pack@claude-plugins-official": false,
-    "cc-plugin-you-should-know@builtin": true,
+    "cc-plugin-you-should-know@builtin": false,
     "design@synced": false,
     "engineering@synced": false,
-    "productivity@synced": false
+    "productivity@synced": false,
+    "ponytail@ponytail": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
       }
     }
   },
@@ -92,14 +266,22 @@
       "effortLevel": "high"
     },
     "claude-opus-5-5": {
-      "effortLevel": "xhigh"
+      "effortLevel": "high"
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "medium"
     }
   },
-  "advisorModel": "fable",
   "pluginConfigs": {
     "agents-md@builtin": {
       "options": {
         "instructionFiles": "claude-md"
+      }
+    },
+    "ponytail@ponytail": {
+      "options": {
+        "ledger": true,
+        "sendNames": true
       }
     }
   },

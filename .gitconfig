@@ -7,6 +7,7 @@
   eol = input
 	excludesFile = ~/.gitignore_global
 	pager = delta
+	quotepath = false
 [github]
   user = rwaterman
 [push]

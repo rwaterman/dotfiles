@@ -1,5 +1,6 @@
 # Language
 export LANG='en_US.UTF-8'
+# export LANG='ja_JP.UTF-8'
 
 # XDG
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -25,7 +26,8 @@ case "$USER" in
   rick-sroa) export AWS_REGION="us-east-1" ;;
   *)         export AWS_REGION="us-west-2" ;;
 esac
-
+export AWS_PAGER="" # Prevents LLMs from freezing due to AWS built-in pagination
+#
 # TLS: Needed for running some Python tools locally 
 export SSL_CERT_FILE="/etc/ssl/cert.pem"
 
