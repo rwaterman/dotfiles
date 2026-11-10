@@ -1,6 +1,4 @@
-tap "anomalyco/tap"
 tap "hashicorp/tap"
-tap "nohajc/anylinuxfs", trusted: true
 brew "awk"
 brew "awscli"
 brew "awslogs"
@@ -65,9 +63,7 @@ brew "yank"
 brew "yazi"
 brew "zoxide"
 brew "zsh-completions"
-brew "anomalyco/tap/opencode", trusted: true
 brew "hashicorp/tap/terraform", trusted: true
-brew "nohajc/anylinuxfs/anylinuxfs"
 cask "backblaze"
 cask "chatgpt"
 cask "claude"
