@@ -93,4 +93,4 @@ copy-on-select = clipboard
 # to WezTerm's default_hyperlink_rules().
 
 # Run Tmux
-command = shell:"$HOME/brew/bin/tmux" new-session -A -s main
+command = shell:"/opt/homebrew/bin/tmux" new-session -A -s main
