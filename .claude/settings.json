@@ -2,11 +2,17 @@
   "skillListingBudgetFraction": 0.05,
   "env": {
     "ENABLE_TOOL_SEARCH": "auto",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5-5"
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-5-5",
+    "ANTHROPIC_CUSTOM_MODEL_OPTION": "caveman-auto[1m]",
+    "ANTHROPIC_CUSTOM_MODEL_OPTION_NAME": "Auto",
+    "ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION": "Caveman pick model + effort each turn. Hard ask, big brain. Easy ask, save rocks.",
+    "ANTHROPIC_CUSTOM_MODEL_OPTION_SUPPORTED_CAPABILITIES": "effort,max_effort,xhigh_effort,thinking,adaptive_thinking,interleaved_thinking",
+    "CLAUDE_CODE_SUBAGENT_EFFORT": "high"
   },
   "permissions": {
     "defaultMode": "auto"
   },
+  "model": "claude-fable-5-2",
   "disableClaudeAiConnectors": true,
   "skillOverrides": {
     "aws-core:amazon-bedrock": "off",
@@ -236,7 +242,11 @@
     "design@synced": false,
     "engineering@synced": false,
     "productivity@synced": false,
-    "ponytail@ponytail": true
+    "ponytail@ponytail": true,
+    "caveman@caveman": true,
+    "aws-data-analytics@anthropic-plugin-directory": true,
+    "context7@anthropic-plugin-directory": true,
+    "pydantic-ai@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -250,9 +260,15 @@
         "source": "github",
         "repo": "DietrichGebert/ponytail"
       }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
     }
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "modelSettings": {
     "claude-opus-5": {
       "effortLevel": "xhigh"
@@ -267,7 +283,10 @@
       "effortLevel": "high"
     },
     "claude-sonnet-5-5": {
-      "effortLevel": "medium"
+      "effortLevel": "high"
+    },
+    "claude-fable-5-2": {
+      "effortLevel": "high"
     }
   },
   "pluginConfigs": {

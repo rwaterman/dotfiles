@@ -84,8 +84,6 @@ elif is_linux; then
   export CXXFLAGS="${CXXFLAGS:--O3 -march=native}"
 fi
 
-export PATH="$HOME/brew/bin:$PATH"
-
 # Python / pyenv
 export PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations --with-lto"
 have pyenv && eval "$(pyenv init -)"
@@ -95,9 +93,9 @@ have gh && export GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)"
 
 # FZF
 # macOS / Homebrew (Apple Silicon)
-if [[ -f $HOME/brew/opt/fzf/shell/key-bindings.zsh ]]; then
-  source $HOME/brew/opt/fzf/shell/key-bindings.zsh
-  source $HOME/brew/opt/fzf/shell/completion.zsh
+if is_macos && [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
+  source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
+  source /opt/homebrew/opt/fzf/shell/completion.zsh
 fi
 
 # Arch
@@ -154,4 +152,5 @@ export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS=1
-export PATH=/opt/homebrew/bin:$PATH
+# /etc/zprofile path_helper moves system dirs ahead of the Homebrew entries set in .zshenv
+is_macos && path=(/opt/homebrew/opt/curl/bin /opt/homebrew/bin /opt/homebrew/sbin $path)

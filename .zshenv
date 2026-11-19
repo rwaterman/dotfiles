@@ -27,7 +27,9 @@ export AWS_REGION="us-east-1"
 export AWS_PAGER="" # Prevents LLMs from freezing due to AWS built-in pagination
 #
 # TLS: Needed for running some Python tools locally 
-export SSL_CERT_FILE="/etc/ssl/cert.pem"
+[[ -f /etc/ssl/cert.pem ]] && export SSL_CERT_FILE="/etc/ssl/cert.pem"
 
 # PATH
-export PATH="/opt/homebrew/bin:$HOME/.local/bin:$PATH"
+typeset -U path
+path=($HOME/.local/bin $path)
+[[ $OSTYPE == darwin* ]] && path=(/opt/homebrew/bin /opt/homebrew/sbin $path)

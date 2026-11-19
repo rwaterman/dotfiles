@@ -12,14 +12,23 @@ Architect who still codes: frame durable decisions as trade-offs, but implement 
 
 ## Environment
 
-macOS Tahoe. Interactive shell: zsh with Oh-My-Zsh.
+Primary machine: macOS 27. The same dotfiles also run on Arch and Ubuntu Linux, so check `uname -s` when a command depends on the OS. Interactive shell: zsh with Oh-My-Zsh.
 
 - CLI one-liners and copy-paste commands must be zsh-compatible.
 - Claude Code's Bash tool runs zsh, which keeps an unquoted `$var` as one word, so `for x in $list` runs once. Split explicitly: `${=var}` on whitespace, `${(f)var}` on lines, or use an array.
 - Bash scripts are fine when run explicitly as scripts.
-- Do not assume GNU coreutils — prefer POSIX/BSD-compatible flags or note a Homebrew dependency explicitly. Avoid `date -d`, `readlink -f`, `sed -i` without `''`, GNU-only `find`/`xargs`/`grep`/`stat` flags, and Bash 4-only features such as `declare -A` or `mapfile`.
-- `curl` is installed via Homebrew (newer than the system `/usr/bin/curl`); modern curl flags are fine.
 - Use `rg` and `rg --files` for search when available.
+- Scripts and docs that other people or CI will run stay portable across macOS and Linux: POSIX flags only, no Bash 4-only features such as `declare -A` or `mapfile`, or name the dependency explicitly.
+
+On macOS:
+
+- Unprefixed `date`, `readlink`, `sed`, `find`, `xargs`, `grep` and `stat` are BSD. Do not use GNU-only flags on them, such as `date -d`, `readlink -f` or `sed -i` without `''`.
+- GNU coreutils, `yq` and `moreutils` are installed via Homebrew. GNU tools carry a `g` prefix, and `gnubin` is kept off PATH. Use them freely in commands you run here: `gtimeout` to bound commands that can hang (network, AWS, database), `gdate -d` and `gdate -u` for date math and UTC conversion, `greadlink -f`, `yq` for YAML, `sponge` to rewrite a file in place, and `ts` to timestamp output.
+- Homebrew `curl` comes first on PATH, ahead of the system `/usr/bin/curl`, so modern curl flags are fine.
+
+On Linux:
+
+- Unprefixed tools are GNU, so use `timeout`, `date -d` and `readlink -f` directly. The `g`-prefixed names do not exist.
 
 ## Timezones
 
