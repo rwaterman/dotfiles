@@ -29,6 +29,11 @@ export AWS_PAGER="" # Prevents LLMs from freezing due to AWS built-in pagination
 # TLS: Needed for running some Python tools locally 
 [[ -f /etc/ssl/cert.pem ]] && export SSL_CERT_FILE="/etc/ssl/cert.pem"
 
+# TLS: Aikido Device Protection inspects TLS through a local CA; uv and Python need its bundle, which also holds the system roots
+aikido_ca="/Library/Application Support/AikidoSecurity/EndpointProtection/run/endpoint-protection-openssl-combined-ca.pem"
+[[ -f $aikido_ca ]] && export SSL_CERT_FILE="$aikido_ca"
+unset aikido_ca
+
 # PATH
 typeset -U path
 path=($HOME/.local/bin $path)
